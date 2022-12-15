@@ -1,0 +1,117 @@
+.center_items_vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.fill-parent-div {
+    width: 100%;
+    height: 100%;
+}
+
+.sm-padding {
+    padding: 1rem;
+}
+
+.hide {
+    display: none;
+}
+
+.invisible {
+    opacity: 0;
+}
+// Arrow class
+.arrow {
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+
+    &__right {
+        transform: rotate(-45deg);
+        -webkit-transform: rotate(-45deg);
+    }
+
+    &__left {
+        transform: rotate(135deg);
+        -webkit-transform: rotate(135deg);
+    }
+
+    &__up {
+        transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
+    }
+
+    &__down {
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+    }
+}
+
+
+.switch {
+    display: grid;
+    place-items: center;
+    position: relative;
+    width: 55px;
+    height: 25px;
+
+    & .form-check {
+        z-index: 1;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    input {
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    & .form-check:has(input:checked) + &__slider {
+        background-color: #2196F3;
+    }
+
+    & .form-check:has(input:focus) + &__slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    & .form-check:has(input:checked) + &__slider::before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+    }
+
+    &__slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+
+        &::before {
+            position: absolute;
+            content: "";
+            height: 19px;
+            width: 19px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        &.switch__round {
+            border-radius: 34px;
+        }
+
+        &.switch__round::before {
+            border-radius: 50%;
+        }
+    }
+}
