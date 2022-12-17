@@ -6,48 +6,54 @@
     padding: 2rem;
     // make a grid of 16 by 16
     display: grid;
-    grid-template-columns: minmax(0, 0.2fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr);
     grid-gap: 2rem;
+    
 
-    &__filter {
-        border-right: 1px solid black;
-        border-left: 1px solid black;
-        padding: 0 2rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        overflow-y: auto;
+    &__graph {
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: minmax(0,0.2fr) minmax(0,1fr);
+        gap: 3rem;
+        &--type {
 
-        & > *:not(:last-child) {
-            position: relative;
-            margin-bottom: 2.5rem;
-            &:after {
-                position: absolute;
-                content: '';
-                border-bottom: 0.5px solid silver;
-                width: 70%;
-                transform: translateX(-50%);
-                bottom: -15px;
-                left: 50%;
+        }
+
+        &--fig {
+            
+        }
+    }
+
+    &__load-popup{
+        width: 98%;
+        margin: 1%;
+
+        & dash-fixed-content {
+            margin: none !important;
+        }
+        &--btn {
+            background-color: #66ccff; 
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            cursor: pointer;
+            font-size: 15px;
+            border-radius: 4px;
+            float: right;
+
+            &:hover {
+                animation: color-change 1s linear forwards;
+            }
+
+            @keyframes color-change {
+                0% {
+                    background-color: #66ccff; /* start with the original background color */
+                }
+                100% {
+                    background-color: #0066ff; /* change to a darker blue halfway through the animation */
+                }
             }
         }
     }
-
-    &__info {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0,1fr));
-        grid-template-rows: minmax(0, 0.7fr) minmax(0, 0.1fr) minmax(0, 1fr);
-        gap: 5rem;
-        place-items: center;
-        
-        & .dash-dropdown {
-            width: 100%;
-        }
-        
-        &--kpi {
-            font-size: 110%;
-        }
-    }
-    
 }
 

@@ -1,1 +1,1 @@
-# ibm_customers
+# Dash Component Generator

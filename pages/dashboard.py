@@ -1,74 +1,68 @@
-import vaex
-from dash import html, dcc
-from layout import header, sub_header
-from components import (
-    card,
-    category_switch,
-    kpi
-)
-import uuid
+from dash import html, dcc, dash_table
 from pprint import pprint
 import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
+import pandas as pd
+import plotly.graph_objects as go
+from callbacks.callbacks import *
+from components import *
 
-df = vaex.open("assets/data/ibm-customers.hdf5")
 
 def dashboard():
     return html.Div(
         className='dashboard',
         children=[
             html.Div(
-                className='dashboard__filter',
-                children=[
-                    dcc.Dropdown(
-                        ['New York City', 'Montreal', 'San Francisco'],
-                        ['Montreal', 'San Francisco'],
-                        multi=True
-                    ),
-                    category_switch('gender', ['Male', 'Female']),
-                    category_switch('SeniorCitizen', ['True', 'False']),
-                    category_switch('Partner', ['True', 'False']),
-                    category_switch('Dependents', ['True', 'False']),
-                    category_switch('PhoneService', ['True', 'False']),
-                    category_switch('MultipleLines', ['True', 'False']),
-                    category_switch('OnlineSecurity', ['True', 'False']),
-                    category_switch('OnlineBackup', ['True', 'False']),
-                    category_switch('DeviceProtection', ['True', 'False']),
-                    category_switch('TechSupport', ['True', 'False']),
-                    category_switch('StreamingTV', ['True', 'False']),
-                    category_switch('StreamingMovies', ['True', 'False']),
-                    category_switch('PaperlessBilling', ['True', 'False']),
-                    category_switch('Churn', ['True', 'False']),
-                ]
+                className='dashboard__args',
+                children=dmc.Tabs(
+                    grow=True,
+                    children=[
+                        dmc.Tab(label="Data", children=[
+                            dcc.Upload(
+                                id='upload-data',
+                                children=html.Div([
+                                    'Drag and Drop or ',
+                                    html.A('Select Files')
+                                ]),
+                                style={
+                                    'width': '100%',
+                                    'height': '60px',
+                                    'lineHeight': '60px',
+                                    'borderWidth': '1px',
+                                    'borderStyle': 'dashed',
+                                    'borderRadius': '5px',
+                                    'textAlign': 'center',
+                                    'margin': '10px'
+                                },
+                            )
+                        ]),
+                        dmc.Tab(label="Figure", children=[]),
+                        dmc.Tab(id='args-tab',label="args", children=[]),
+                    ]
+                )
             ),
             html.Div(
-                className='dashboard__info',
+                className='dashboard__graph',
                 children=[
-                    kpi(
-                        kpi_name='avg_monthly',
-                        text='Avg monthly charges',
-                        value=300,
-                        className='dashboard__info--kpi dashboard__info--kpi__1'
-                    ),
-                    kpi(
-                        kpi_name='total_charges',
-                        text='Total Charges',
-                        value=3500,
-                        className='dashboard__info--kpi dashboard__info--kpi__2'
-                    ),
                     dcc.Dropdown(
-                        ['New York City', 'Montreal', 'San Francisco'],
-                        'Montreal',
+                        options=[
+                            {'label': 'Line Chart', 'value': 'line_chart'},
+                            {'label': 'Bar Chart', 'value': 'bar_chart'},
+                        ],
+                        value='line_chart',
+                        className='dashboard__graph--type',
+                        id='graph-type',
                         clearable=False,
-                        className='dashboard__info--dd dashboard__info--dd__1'
                     ),
-                    dcc.Dropdown(
-                        ['New York City', 'Montreal', 'San Francisco'],
-                        'Montreal',
-                        clearable=False,
-                        className='dashboard__info--dd dashboard__info--dd__2'
+                    dcc.Graph(
+                        className='dashboard__graph--fig fill-parent-div',
+                        id='graph-fig',
                     ),
                 ]
+            ),
+            dbc.Modal(
+                id='popup',
+                size='xl',
             )
         ]
     )
