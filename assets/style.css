@@ -41,6 +41,10 @@ body {
 .container-page {
   height: 100vh;
   background-color: #f3f3f3; }
+  .container-page > div, .container-page #_pages_content {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box; }
 
 .center_items_vertical {
   display: flex;
@@ -126,6 +130,39 @@ body {
     .switch__slider.switch__round::before {
       border-radius: 50%; }
 
+.btn, .btn__red, .btn__blue {
+  border: none;
+  padding: 10px 30px;
+  cursor: pointer;
+  font-size: 15px;
+  border-radius: 4px; }
+  .btn__red {
+    background-color: #c1485a;
+    color: white; }
+    .btn__red:hover {
+      animation: red-color-change 1s linear forwards; }
+
+@keyframes red-color-change {
+  0% {
+    background-color: #c1485a;
+    /* start with the original background color */ }
+  100% {
+    background-color: #bb0621;
+    /* change to a darker blue halfway through the animation */ } }
+  .btn__blue {
+    background-color: #66ccff;
+    color: white; }
+    .btn__blue:hover {
+      animation: blue-color-change 1s linear forwards; }
+
+@keyframes blue-color-change {
+  0% {
+    background-color: #66ccff;
+    /* start with the original background color */ }
+  100% {
+    background-color: #0066ff;
+    /* change to a darker blue halfway through the animation */ } }
+
 .dashboard {
   height: 100%;
   width: 100%;
@@ -134,7 +171,7 @@ body {
   display: grid;
   grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr);
   grid-gap: 2rem; }
-  .dashboard__graph {
+  .dashboard__components {
     overflow: hidden;
     display: grid;
     grid-template-rows: minmax(0, 0.2fr) minmax(0, 1fr);
@@ -142,8 +179,21 @@ body {
   .dashboard__load-popup {
     width: 98%;
     margin: 1%; }
-    .dashboard__load-popup dash-fixed-content {
-      margin: none !important; }
+    .dashboard__load-popup--filename {
+      text-align: center; }
+    .dashboard__load-popup--date {
+      text-align: center; }
+    .dashboard__load-popup .dash-spreadsheet-inner {
+      min-height: unset !important;
+      min-width: unset !important; }
+    .dashboard__load-popup .dash-fixed-content {
+      margin: 0 !important;
+      padding: 1rem; }
+      .dashboard__load-popup .dash-fixed-content .dash-cell, .dashboard__load-popup .dash-fixed-content .dash-header {
+        font-size: 1.5rem;
+        padding: 5px !important;
+        text-align: center !important;
+        user-select: none !important; }
     .dashboard__load-popup--btn {
       background-color: #66ccff;
       color: white;

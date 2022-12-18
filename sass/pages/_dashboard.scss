@@ -10,7 +10,7 @@
     grid-gap: 2rem;
     
 
-    &__graph {
+    &__components {
         overflow: hidden;
         display: grid;
         grid-template-rows: minmax(0,0.2fr) minmax(0,1fr);
@@ -28,8 +28,28 @@
         width: 98%;
         margin: 1%;
 
-        & dash-fixed-content {
-            margin: none !important;
+        &--filename {
+            text-align: center;
+        }
+
+        &--date {
+            text-align: center;
+        }
+
+        & .dash-spreadsheet-inner {
+            min-height: unset !important;
+            min-width: unset !important;
+        }
+        & .dash-fixed-content {
+            margin: 0 !important;
+            padding: 1rem;
+
+            & .dash-cell, & .dash-header {
+                font-size: 1.5rem;
+                padding: 5px !important;
+                text-align: center !important;
+                user-select: none !important;
+            }
         }
         &--btn {
             background-color: #66ccff; 

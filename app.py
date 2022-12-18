@@ -1,34 +1,32 @@
 from whitenoise import WhiteNoise
 import dash
-from dash import html, dcc
+from dash import html
 import dash_bootstrap_components as dbc
-from pages.dashboard import dashboard
-import vaex
+
+
+TITLE = 'Component Generator'
 
 # Generate the app layout
-def generateAppLayout():
+def layout():
     return html.Div(
         className="container-page",
-        children=[
-            dcc.Location(id='url', refresh=False),
-            dashboard()
-        ]
+        children=dash.page_container
     )
 
 # initilaize the app
 app = dash.Dash(
     __name__, 
     suppress_callback_exceptions=True,
-    external_stylesheets=[dbc.themes.BOOTSTRAP]
+    use_pages=True,
+    external_stylesheets=[dbc.themes.BOOTSTRAP],
 )
 # For the heroku deployment
 server = app.server
 # set the static folder
 server.wsgi_app = WhiteNoise(server.wsgi_app, root='assets/')
-# title
-app.title = 'Component Generator'
 # set the layout
-app.layout = generateAppLayout
+app.layout = layout
+# Initialize the db session
 
 # start the app
 if __name__ == "__main__":

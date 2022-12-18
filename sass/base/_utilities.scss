@@ -115,3 +115,48 @@
         }
     }
 }
+
+
+.btn {
+    border: none;
+    padding: 10px 30px;
+    cursor: pointer;
+    font-size: 15px;
+    border-radius: 4px;
+
+    &__red {
+        @extend .btn;
+        background-color: #c1485a; 
+        color: white;
+        &:hover {
+            animation: red-color-change 1s linear forwards;
+        }
+        @keyframes red-color-change {
+            0% {
+                background-color: #c1485a; /* start with the original background color */
+            }
+            100% {
+                background-color: #bb0621; /* change to a darker blue halfway through the animation */
+            }
+        }
+    }
+    
+    &__blue {
+        @extend .btn;
+        background-color: #66ccff; 
+        color: white;
+        &:hover {
+            animation: blue-color-change 1s linear forwards;
+        }
+        @keyframes blue-color-change {
+            0% {
+                background-color: #66ccff; /* start with the original background color */
+            }
+            100% {
+                background-color: #0066ff; /* change to a darker blue halfway through the animation */
+            }
+        }
+    }
+
+    
+}
