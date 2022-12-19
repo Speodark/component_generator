@@ -130,7 +130,7 @@ body {
     .switch__slider.switch__round::before {
       border-radius: 50%; }
 
-.btn, .btn__red, .btn__blue {
+.btn, .btn__red, .btn__blue, .btn__green, .btn__grey {
   border: none;
   padding: 10px 30px;
   cursor: pointer;
@@ -162,6 +162,32 @@ body {
   100% {
     background-color: #0066ff;
     /* change to a darker blue halfway through the animation */ } }
+  .btn__green {
+    background-color: #42ca81;
+    color: white; }
+    .btn__green:hover {
+      animation: green-color-change 1s linear forwards; }
+
+@keyframes green-color-change {
+  0% {
+    background-color: #42ca81;
+    /* start with the original background color */ }
+  100% {
+    background-color: #3b875e;
+    /* change to a darker blue halfway through the animation */ } }
+  .btn__grey {
+    background-color: #b2bab6;
+    color: white; }
+    .btn__grey:hover {
+      animation: grey-color-change 1s linear forwards; }
+
+@keyframes grey-color-change {
+  0% {
+    background-color: #b2bab6;
+    /* start with the original background color */ }
+  100% {
+    background-color: #8a8c8b;
+    /* change to a darker blue halfway through the animation */ } }
 
 .dashboard {
   height: 100%;
@@ -174,8 +200,80 @@ body {
   .dashboard__components {
     overflow: hidden;
     display: grid;
-    grid-template-rows: minmax(0, 0.2fr) minmax(0, 1fr);
-    gap: 3rem; }
+    grid-template-rows: min-content minmax(0, 1fr);
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.1fr) minmax(0, 0.1fr) minmax(0, 0.1fr) minmax(0, 0.1fr);
+    gap: 2rem; }
+    .dashboard__components .dash-dropdown {
+      height: 100%; }
+      .dashboard__components .dash-dropdown .Select {
+        height: 100%; }
+        .dashboard__components .dash-dropdown .Select .Select-control {
+          height: 100%; }
+    .dashboard__components--type .Select-value {
+      display: flex;
+      align-items: center; }
+    .dashboard__components--add-component-btn__while-none {
+      grid-column: 1/-1;
+      grid-row: 1/2;
+      width: max-content;
+      display: block;
+      margin: auto; }
+    .dashboard__components--fig {
+      grid-row: 2/3;
+      grid-column: 1/-1; }
+  .dashboard__add-component {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) min-content minmax(0, 1fr);
+    padding: 1.5rem;
+    gap: 0.5rem; }
+    .dashboard__add-component--title {
+      font-size: 1.8em;
+      grid-row: 1/2;
+      place-self: center; }
+    .dashboard__add-component--input {
+      grid-row: 2/3;
+      width: 25rem;
+      place-self: center;
+      height: 70%; }
+    .dashboard__add-component--warning {
+      grid-row: 3/4;
+      place-self: center;
+      font-size: 1.2em;
+      color: red; }
+    .dashboard__add-component--create-btn {
+      grid-row: 4/5;
+      grid-column: 1/2;
+      width: max-content;
+      place-self: end; }
+    .dashboard__add-component--cancel-btn {
+      grid-row: 4/5;
+      grid-column: 1/2;
+      width: max-content;
+      place-self: start; }
+  .dashboard__delete-popup {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) max-content;
+    padding: 1.5rem;
+    gap: 0.5rem; }
+    .dashboard__delete-popup--title {
+      font-size: 1.8em;
+      grid-row: 1/2;
+      text-align: center; }
+    .dashboard__delete-popup--warning {
+      grid-row: 2/3;
+      font-size: 1.5em;
+      color: red;
+      text-align: center; }
+    .dashboard__delete-popup--delete {
+      grid-row: 3/4;
+      grid-column: 1/2;
+      width: max-content;
+      place-self: end; }
+    .dashboard__delete-popup--cancel {
+      grid-row: 3/4;
+      grid-column: 1/2;
+      width: max-content;
+      place-self: start; }
   .dashboard__load-popup {
     width: 98%;
     margin: 1%; }

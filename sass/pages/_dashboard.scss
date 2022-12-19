@@ -13,14 +13,113 @@
     &__components {
         overflow: hidden;
         display: grid;
-        grid-template-rows: minmax(0,0.2fr) minmax(0,1fr);
-        gap: 3rem;
-        &--type {
+        grid-template-rows: min-content minmax(0,1fr);
+        grid-template-columns: minmax(0,0.9fr) minmax(0,0.1fr) minmax(0,0.1fr) minmax(0,0.1fr) minmax(0,0.1fr);
+        gap: 2rem;
 
+        & .dash-dropdown{
+            height: 100%;
+            & .Select {
+                height: 100%;
+                & .Select-control {
+                    height: 100%;
+                }
+            }
+        }
+        &--type {
+            & .Select-value {
+                display: flex;
+                align-items: center;
+            }
+        }
+
+        &--add-component-btn {
+            &__while-none {
+                grid-column: 1/-1;
+                grid-row: 1/2;
+                width: max-content;
+                display: block;
+                margin: auto;
+            }
         }
 
         &--fig {
-            
+            grid-row: 2/3;
+            grid-column: 1/-1;
+        }
+    }
+
+    &__add-component {
+        display: grid;
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) min-content minmax(0, 1fr);
+        padding: 1.5rem;
+        gap: 0.5rem;
+        &--title {
+            font-size: 1.8em;
+            grid-row: 1/2;
+            place-self: center;
+        }
+
+        &--input {
+            grid-row: 2/3;
+            width: 25rem;
+            place-self: center;
+            height: 70%;
+        }
+
+        &--warning {
+            grid-row: 3/4;
+            place-self: center;
+            font-size: 1.2em;
+            color: red;
+        }
+
+        &--create-btn {
+            grid-row: 4/5;
+            grid-column: 1/2;
+            width: max-content;
+            place-self: end;
+        }
+
+        &--cancel-btn {
+            grid-row: 4/5;
+            grid-column: 1/2;
+            width: max-content;
+            place-self: start;
+        }
+    }
+
+    &__delete-popup {
+        display: grid;
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) max-content;
+        padding: 1.5rem;
+        gap: 0.5rem;
+
+        &--title {
+            font-size: 1.8em;
+            grid-row: 1/2;
+            text-align: center;
+        }
+
+        &--warning {
+            grid-row: 2/3;
+            font-size: 1.5em;
+            color: red;
+            text-align: center;
+        }
+
+        &--delete {
+            grid-row: 3/4;
+            grid-column: 1/2;
+            width: max-content;
+            place-self: end;
+        }
+
+        &--cancel {
+            grid-row: 3/4;
+            grid-column: 1/2;
+            width: max-content;
+            place-self: start;
         }
     }
 

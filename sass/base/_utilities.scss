@@ -158,5 +158,38 @@
         }
     }
 
+    &__green {
+        @extend .btn;
+        background-color: #42ca81; 
+        color: white;
+        &:hover {
+            animation: green-color-change 1s linear forwards;
+        }
+        @keyframes green-color-change {
+            0% {
+                background-color: #42ca81; /* start with the original background color */
+            }
+            100% {
+                background-color: #3b875e; /* change to a darker blue halfway through the animation */
+            }
+        }
+    }
+
+    &__grey {
+        @extend .btn;
+        background-color: #b2bab6; 
+        color: white;
+        &:hover {
+            animation: grey-color-change 1s linear forwards;
+        }
+        @keyframes grey-color-change {
+            0% {
+                background-color: #b2bab6; /* start with the original background color */
+            }
+            100% {
+                background-color: #8a8c8b; /* change to a darker blue halfway through the animation */
+            }
+        }
+    }
     
 }
