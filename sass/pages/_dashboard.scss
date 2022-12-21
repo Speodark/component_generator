@@ -20,6 +20,95 @@
         grid-row: 1/-1;
         grid-column: 1/2;
     }
+
+    
+    &__data {
+        &--load-popup {
+            width: 98%;
+            margin: 1%;
+            display: grid;
+            grid-template-rows: minmax(0, 1fr) min-content min-content min-content;
+            grid-template-columns: minmax(0,1fr);
+            gap: 1rem;
+            &__data {
+                grid-row: 1/2;
+                
+                &--title {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+
+                    & > Span {
+                        font-weight: bold;
+                        font-size: 1.8rem;
+                        
+                        &:not(:last-child) {
+                            margin-right: 0.5rem;
+                        }
+                    }
+                }
+    
+                & .dash-spreadsheet-inner {
+                    min-height: unset !important;
+                    min-width: unset !important;
+                }
+                & .dash-fixed-content {
+                    margin: 0 !important;
+                    padding: 1rem;
+    
+                    & .dash-cell, & .dash-header {
+                        font-size: 1.5rem;
+                        padding: 5px !important;
+                        text-align: center !important;
+                        user-select: none !important;
+                    }
+                }
+            }
+
+            &__input-container {
+                grid-row: 2/3;
+                grid-column: 1/2;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            &__input-title {
+                font-size: 1.8em;
+                font-weight: bold;
+                margin-right: 1rem;
+            }
+
+            &__input {
+                width: 25rem;
+                height: 100%;
+                font-size: 1.5rem;
+            }
+
+            &__warning {
+                grid-row: 3/4;
+                place-self: center;
+                font-size: 1.2em;
+                color: red;
+            }
+
+            &__load {
+                grid-row: 4/5;
+                grid-column: 1/2;
+                width: max-content;
+                place-self: end;
+            }
+
+            &__cancel {
+                grid-row: 4/5;
+                grid-column: 1/2;
+                width: max-content;
+                place-self: start;
+                
+            }
+            
+        }
+    }
     
 
     &__components {
@@ -134,58 +223,6 @@
             grid-column: 1/2;
             width: max-content;
             place-self: start;
-        }
-    }
-
-    &__load-popup{
-        width: 98%;
-        margin: 1%;
-
-        &--filename {
-            text-align: center;
-        }
-
-        &--date {
-            text-align: center;
-        }
-
-        & .dash-spreadsheet-inner {
-            min-height: unset !important;
-            min-width: unset !important;
-        }
-        & .dash-fixed-content {
-            margin: 0 !important;
-            padding: 1rem;
-
-            & .dash-cell, & .dash-header {
-                font-size: 1.5rem;
-                padding: 5px !important;
-                text-align: center !important;
-                user-select: none !important;
-            }
-        }
-        &--btn {
-            background-color: #66ccff; 
-            color: white;
-            border: none;
-            padding: 10px 30px;
-            cursor: pointer;
-            font-size: 15px;
-            border-radius: 4px;
-            float: right;
-
-            &:hover {
-                animation: color-change 1s linear forwards;
-            }
-
-            @keyframes color-change {
-                0% {
-                    background-color: #66ccff; /* start with the original background color */
-                }
-                100% {
-                    background-color: #0066ff; /* change to a darker blue halfway through the animation */
-                }
-            }
         }
     }
 }

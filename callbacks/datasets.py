@@ -8,7 +8,7 @@ from datetime import datetime
 from pprint import pprint
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from utilities.db import name_exists, add_component, components_count, get_all_components, delete_component_by_id, rename_component
+from utilities.db import dataset_name_exists, add_dataset
 session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
 
 
@@ -57,13 +57,17 @@ def parse_contents(contents, filename, date):
     return (
         [
             # Display the filename and date
-            html.H2(
-                filename,
-                className='dashboard__load-popup--filename'
-            ),
-            html.H5(
-                datetime.fromtimestamp(date),
-                className='dashboard__load-popup--date'
+            html.Div(
+                className='dashboard__data--load-popup__data--title',
+                children=[
+                    html.Span(
+                        filename,
+                    ),
+                    html.Span('-'),
+                    html.Span(
+                        datetime.fromtimestamp(date),
+                    )
+                ]
             ),
             dash_table.DataTable(
                 data=df.to_dict("records"),
@@ -99,33 +103,83 @@ def update_table(contents, filename, last_modified):
     
 
 @dash.callback(
-    Output('popup', 'is_open'),
-    Output('current_data', 'data'),
-    Output('current_data_name', 'data'),
-    Output('current-data-file-name', 'children'),
-    Output('show-data-table-btn', 'disabled'),
+    Output('add-dataset-popup', 'is_open'),
+    # Popup component warning
+    Output('load-dataset-warning', 'children'),
+    Output('load-dataset-warning', 'className'),
+    # INPUTS
     Input('upload_file', 'contents'),
+    # Cancel the data upload
     Input('load-data-btn', 'n_clicks'),
+    # Try and upload the data
+    Input('cancel-load-data-btn', 'n_clicks'),
+    # STATES
+    State('load-dataset-name', 'value'),
     State('uploaded_data', 'data'),
     State('uploaded_data_name', 'data'),
+    State('load-dataset-warning', 'className'),
     prevent_initial_call=True
 )
-def open_popup(contents, n_clicks, uploaded_data, uploaded_data_name):
+def open_popup(
+    contents, 
+    _,
+    __,
+    # STATES
+    dataset_name,
+    uploaded_data, 
+    uploaded_data_name,
+    warning_class
+):
+
+    # List of output variables
+    pop_up_open_output = no_update # is the data upload popup is open
+    warning_text_output = no_update # The text for the warning label
+    warning_class_output = no_update # The class for the warning label
+    
+    
     trigger_id = ctx.triggered_id
     # Close the popup and saves the data.
-    if trigger_id == 'load-data-btn':
-        return (
-            False, 
-            uploaded_data, 
-            uploaded_data_name, 
-            uploaded_data_name, 
-            False
-        )
-    # Open the popup when a file is uploaded
+    if trigger_id == 'upload_file':
+        pop_up_open_output = contents is not None
+    elif trigger_id == 'cancel-load-data-btn':
+        pop_up_open_output = False
+    elif trigger_id == 'load-data-btn':
+        if contents is None:
+            pop_up_open_output = False
+        else:
+            # is the name empty?
+            print(dataset_name, "HELLO")
+            print(type(dataset_name))
+            print(not dataset_name, "ANSWER")
+            if not dataset_name:
+                warning_text_output = 'You must provide a name'
+                warning_class_output = warning_class.replace('hide', '').strip()
+            # Is the name longer than 3 characters?
+            elif len(dataset_name) < 3:
+                warning_text_output = 'The name must be 3 characters or more'
+                warning_class_output = warning_class.replace('hide', '').strip()
+            else:
+                # Checks if the name already exists in the database
+                name_already_exists = False
+                with session_maker() as session:
+                    name_already_exists = dataset_name_exists(dataset_name, session)
+                if name_already_exists:
+                    warning_text_output = 'This name is already taken'
+                    warning_class_output = warning_class.replace('hide', '').strip()
+                else:
+                    # If all good with the name checks
+                    # add dataset
+                    print("GOT HERE")
+                    with session_maker() as session:
+                        add_dataset(dataset_name, uploaded_data, session)
+
+                
+                    pop_up_open_output = False 
+                    warning_text_output = '' 
+                    warning_class_output = warning_class if 'hide' in warning_class else warning_class + ' hide' 
+
     return (
-        contents is not None, 
-        no_update, 
-        no_update, 
-        no_update, 
-        no_update
+        pop_up_open_output, # is the data upload popup is open
+        warning_text_output, # The text for the warning label
+        warning_class_output, # The class for the warning label
     )

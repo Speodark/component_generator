@@ -2,7 +2,7 @@ import dash
 from dash import Input, Output, ctx, no_update, ALL, State
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from utilities.db import name_exists, add_component, components_count, get_all_components, delete_component_by_id, rename_component
+from utilities.db import component_name_exists, add_component, components_count, get_all_components, delete_component_by_id, rename_component
 
 session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
 
@@ -159,7 +159,7 @@ def open_add_component_popup(
             # Checks if the name already exists in the database
             name_already_exists = False
             with session_maker() as session:
-                name_already_exists = name_exists(name, session)
+                name_already_exists = component_name_exists(name, session)
             if name_already_exists:
                 warning_text_output = 'This name is already taken'
                 warning_class_output = not_available_classname.replace('hide', '').strip()
@@ -254,7 +254,7 @@ def open_add_component_popup(
             # Checks if the name already exists in the database
             name_already_exists = False
             with session_maker() as session:
-                name_already_exists = name_exists(rename_value, session)
+                name_already_exists = component_name_exists(rename_value, session)
             if name_already_exists:
                 rename_warning_text_output = 'This name is already taken'
                 rename_warning_class_output = not_available_rename_classname.replace('hide', '').strip()

@@ -14,7 +14,7 @@ import numpy as np
 from collections import OrderedDict
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from utilities.db import name_exists, add_component, components_count, get_all_components, delete_component_by_id, rename_component
+from utilities.db import component_name_exists, add_component, components_count, get_all_components, delete_component_by_id, rename_component
 session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
 
 chart_type_to_class = {
