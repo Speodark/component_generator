@@ -196,12 +196,21 @@ body {
   padding: 2rem;
   display: grid;
   grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr);
+  grid-template-rows: min-content minmax(0, 1fr);
   grid-gap: 2rem; }
+  .dashboard__fig {
+    grid-row: 2/3;
+    grid-column: 2/3; }
+  .dashboard__args {
+    grid-row: 1/-1;
+    grid-column: 1/2; }
   .dashboard__components {
+    grid-row: 1/2;
+    grid-column: 2/3;
     overflow: hidden;
     display: grid;
-    grid-template-rows: min-content minmax(0, 1fr);
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.1fr) minmax(0, 0.1fr) minmax(0, 0.1fr) minmax(0, 0.1fr);
+    grid-template-rows: min-content;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 0.1fr) minmax(0, 0.1fr) minmax(0, 0.1fr) minmax(0, 0.1fr) minmax(0, 0.1fr);
     gap: 2rem; }
     .dashboard__components .dash-dropdown {
       height: 100%; }

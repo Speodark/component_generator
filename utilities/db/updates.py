@@ -7,3 +7,8 @@ def update_trace(trace_id: int, new_args: JSON, session: Session) -> None:
     trace.args = new_args
     session.commit()
 
+
+def rename_component(component_id: int, new_name: str, session: Session) -> None:
+    component = session.query(Components).filter(Components.id == component_id).first()
+    component.name = new_name
+    session.commit()

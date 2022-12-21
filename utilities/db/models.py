@@ -21,3 +21,11 @@ class Components(Base):
     name = Column(String, unique=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     traces = relationship("Traces", back_populates="component")
+
+
+class Datasets(Base):
+    __tablename__ = 'datasets'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    data = Column(JSON)
