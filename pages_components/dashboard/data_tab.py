@@ -1,8 +1,17 @@
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
+from utilities.db import datasets_count, get_all_datasets
+from components import dataset_card
 
-def dashboard_data_tab():
+
+
+def dashboard_data_tab(session_maker):
+    datasets_cards = []
+    with session_maker() as session:
+        num_of_datasets = datasets_count(session)
+        if num_of_datasets > 0: 
+            datasets_cards = [dataset_card(dataset.id, dataset.name) for dataset in get_all_datasets(session)]
     return dmc.Tab(
         label="Data", 
         children=html.Div(
@@ -27,17 +36,15 @@ def dashboard_data_tab():
                         'margin': '10px'
                     },
                 ),
-                # html.Div(
-                #     className='dashboard__data--filename',
-                #     id='current-data-file-name',
-                #     children='Upload a File'
-                # ),
-                # html.Button(
-                #     id='show-data-table-btn',
-                #     className='dashboard__load-popup--btn',
-                #     children='Show Table',
-                #     disabled=True
-                # ),
+                html.Div(
+                    className='fill-parent-div dashboard__data-tab--datasets-container',
+                    id='dataset-cards-container',
+                    children=datasets_cards
+                ),
+
+
+
+
                 # Pop Ups
                 dbc.Modal(
                     id='add-dataset-popup',

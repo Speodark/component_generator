@@ -8,7 +8,8 @@ from datetime import datetime
 from pprint import pprint
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from utilities.db import dataset_name_exists, add_dataset
+from utilities.db import dataset_name_exists, add_dataset, datasets_count, get_all_datasets
+from components import dataset_card
 session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
 
 
@@ -107,6 +108,8 @@ def update_table(contents, filename, last_modified):
     # Popup component warning
     Output('load-dataset-warning', 'children'),
     Output('load-dataset-warning', 'className'),
+    # the dataset cards container childrens
+    Output('dataset-cards-container', 'children'),
     # INPUTS
     Input('upload_file', 'contents'),
     # Cancel the data upload
@@ -135,7 +138,7 @@ def open_popup(
     pop_up_open_output = no_update # is the data upload popup is open
     warning_text_output = no_update # The text for the warning label
     warning_class_output = no_update # The class for the warning label
-    
+    dataset_cards_container_output = no_update # The childrens for the dataset cards container
     
     trigger_id = ctx.triggered_id
     # Close the popup and saves the data.
@@ -148,9 +151,6 @@ def open_popup(
             pop_up_open_output = False
         else:
             # is the name empty?
-            print(dataset_name, "HELLO")
-            print(type(dataset_name))
-            print(not dataset_name, "ANSWER")
             if not dataset_name:
                 warning_text_output = 'You must provide a name'
                 warning_class_output = warning_class.replace('hide', '').strip()
@@ -169,10 +169,13 @@ def open_popup(
                 else:
                     # If all good with the name checks
                     # add dataset
-                    print("GOT HERE")
                     with session_maker() as session:
                         add_dataset(dataset_name, uploaded_data, session)
-
+                    dataset_cards_container_output = []
+                    with session_maker() as session:
+                        num_of_datasets = datasets_count(session)
+                        if num_of_datasets > 0: 
+                            dataset_cards_container_output = [dataset_card(dataset.id, dataset.name) for dataset in get_all_datasets(session)]
                 
                     pop_up_open_output = False 
                     warning_text_output = '' 
@@ -182,4 +185,5 @@ def open_popup(
         pop_up_open_output, # is the data upload popup is open
         warning_text_output, # The text for the warning label
         warning_class_output, # The class for the warning label
+        dataset_cards_container_output, # The childrens for the dataset cards container
     )

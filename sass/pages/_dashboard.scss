@@ -21,6 +21,15 @@
         grid-column: 1/2;
     }
 
+    &__data-tab {
+        &--datasets-container {
+            margin-top: 2rem;
+            & > *:not(:last-child) {
+                margin-bottom: 1.5rem;
+            }
+        }
+    }
+
     
     &__data {
         &--load-popup {

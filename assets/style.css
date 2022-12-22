@@ -189,6 +189,41 @@ body {
     background-color: #8a8c8b;
     /* change to a darker blue halfway through the animation */ } }
 
+.dataset-card {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 12px; }
+  .dataset-card__name {
+    flex: 1;
+    font-size: 1em;
+    font-weight: bold;
+    text-align: left; }
+  .dataset-card__buttons {
+    display: flex;
+    justify-content: flex-end; }
+    .dataset-card__buttons > *:not(:last-child) {
+      margin-right: 0.8rem; }
+  .dataset-card__button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    padding: 0; }
+    .dataset-card__button .eye-icon {
+      transition: color 0.5s; }
+      .dataset-card__button .eye-icon:hover {
+        color: lightgreen; }
+    .dataset-card__button .pen-icon {
+      transition: color 0.5s; }
+      .dataset-card__button .pen-icon:hover {
+        color: lightskyblue; }
+    .dataset-card__button .trash-icon {
+      transition: color 0.5s; }
+      .dataset-card__button .trash-icon:hover {
+        color: red; }
+
 .dashboard {
   height: 100%;
   width: 100%;
@@ -204,6 +239,10 @@ body {
   .dashboard__args {
     grid-row: 1/-1;
     grid-column: 1/2; }
+  .dashboard__data-tab--datasets-container {
+    margin-top: 2rem; }
+    .dashboard__data-tab--datasets-container > *:not(:last-child) {
+      margin-bottom: 1.5rem; }
   .dashboard__data--load-popup {
     width: 98%;
     margin: 1%;

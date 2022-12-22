@@ -23,11 +23,11 @@ session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.d
 
 
 
-def dashboard_args():
+def dashboard_args(session_maker):
     return dmc.Tabs(
         grow=True,
         children=[
-            dashboard_data_tab(),
+            dashboard_data_tab(session_maker),
             dmc.Tab(
                 label="Graph Traces", 
                 children=html.Div(
@@ -60,7 +60,7 @@ def layout():
         children=[
             html.Div(
                 className='dashboard__args',
-                children=dashboard_args()
+                children=dashboard_args(session_maker)
             ),
             # The component figure
             dcc.Graph(

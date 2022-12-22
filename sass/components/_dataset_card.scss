@@ -1,0 +1,51 @@
+.dataset-card {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 12px;
+
+    &__name {
+        flex: 1;
+        font-size: 1em;
+        font-weight: bold;
+        text-align: left;
+    }
+
+    &__buttons {
+        display: flex;
+        justify-content: flex-end;
+        & > *:not(:last-child) {
+            margin-right: 0.8rem;
+        }
+    }
+
+    &__button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        outline: none;
+        padding: 0;
+
+        & .eye-icon {
+            transition: color 0.5s;
+            &:hover {
+                color: lightgreen;
+            }
+        }
+
+        & .pen-icon {
+            transition: color 0.5s;
+            &:hover {
+                color: lightskyblue;
+            }
+        }
+
+        & .trash-icon {
+            transition: color 0.5s;
+            &:hover {
+                color: red;
+            }
+        }
+    }
+}
