@@ -4,10 +4,42 @@ import dash_mantine_components as dmc
 from utilities.db import datasets_count, get_all_datasets
 from components import dataset_card
 
-
+def delete_dataset_popup():
+    return dbc.Modal(
+        id='delete-dataset-popup',
+        size='sm',
+        centered=True,
+        children=html.Div(
+            className='dashboard__delete-popup',
+            children=[
+                dcc.Store(id='dataset_id_to_delete'),
+                html.Span(
+                    className='dashboard__delete-popup--title',
+                    children='Are you sure you want to delete the dataset?'
+                ),
+                html.Span(
+                    className='dashboard__delete-popup--warning',
+                    children="You won't be able to retrieve the dataset information!"
+                ),
+                # Delete the component
+                html.Button(
+                    id='delete-dataset-btn',
+                    className='btn__red dashboard__delete-popup--delete',
+                    children='Delete'
+                ),
+                # Cancel
+                html.Button(
+                    id='cancel-dataset-delete-btn',
+                    className='btn__blue dashboard__delete-popup--cancel',
+                    children='Cancel'
+                ),
+            ]
+        ),
+    )
 
 def dashboard_data_tab(session_maker):
     datasets_cards = []
+    num_of_datasets = None
     with session_maker() as session:
         num_of_datasets = datasets_count(session)
         if num_of_datasets > 0: 
@@ -36,6 +68,9 @@ def dashboard_data_tab(session_maker):
                         'margin': '10px'
                     },
                 ),
+                dcc.Store(id='deleted_dataset_trigger',data=0),
+                dcc.Store(id='added_dataset_trigger',data=0),
+                dcc.Store(id='renamed_dataset_trigger',data=0),
                 html.Div(
                     className='fill-parent-div dashboard__data-tab--datasets-container',
                     id='dataset-cards-container',
@@ -95,6 +130,7 @@ def dashboard_data_tab(session_maker):
                         ]
                     )
                 ),
+                delete_dataset_popup(),
                 dbc.Modal(
                     id='show-table-popup',
                     size='xl',
@@ -112,10 +148,7 @@ def dashboard_data_tab(session_maker):
                     ],
                 ),
                 # Data stores
-                dcc.Store(id='uploaded_data'),
-                dcc.Store(id='uploaded_data_name'),
-                dcc.Store(id='current_data'),
-                dcc.Store(id='current_data_name'),
+                dcc.Store(id='uploaded_data')
             ]
         )
     )

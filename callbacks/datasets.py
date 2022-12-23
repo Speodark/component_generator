@@ -2,13 +2,14 @@ import base64
 import io
 import dash
 from dash import Input, Output, dcc, html, ctx, no_update, ALL, dash_table, State
+from dash.exceptions import PreventUpdate
 import pandas as pd
 from components import *
 from datetime import datetime
 from pprint import pprint
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from utilities.db import dataset_name_exists, add_dataset, datasets_count, get_all_datasets
+from utilities.db import dataset_name_exists, add_dataset, datasets_count, get_all_datasets, delete_dataset
 from components import dataset_card
 session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
 
@@ -91,7 +92,6 @@ def parse_contents(contents, filename, date):
 @dash.callback(
     Output('popup-file-data', 'children'),
     Output('uploaded_data', 'data'),
-    Output('uploaded_data_name', 'data'),
     Input('upload_file', 'contents'),
     State("upload_file", "filename"),
     State("upload_file", "last_modified"),
@@ -100,16 +100,37 @@ def parse_contents(contents, filename, date):
 def update_table(contents, filename, last_modified):
     if contents is not None and contents != '' and ctx.triggered_id == "upload_file":
         children, df = parse_contents(contents, filename, last_modified)
-        return children, df.to_dict('records'), filename
+        return children, df.to_dict('records')
     
 
+
+@dash.callback(
+    # the dataset cards container childrens
+    Output('dataset-cards-container', 'children'),
+    Input('added_dataset_trigger', 'data'),
+    Input('deleted_dataset_trigger', 'data'),
+    prevent_initial_call=True
+)
+def update_datasets_container(
+    added_trigger,
+    deleted_trigger
+):
+    dataset_cards_container_output = []
+    with session_maker() as session:
+        num_of_datasets = datasets_count(session)
+        if num_of_datasets > 0: 
+            dataset_cards_container_output = [dataset_card(dataset.id, dataset.name) for dataset in get_all_datasets(session)]
+
+    return dataset_cards_container_output
+
+    
 @dash.callback(
     Output('add-dataset-popup', 'is_open'),
     # Popup component warning
     Output('load-dataset-warning', 'children'),
     Output('load-dataset-warning', 'className'),
-    # the dataset cards container childrens
-    Output('dataset-cards-container', 'children'),
+    # Number of datasets left
+    Output('added_dataset_trigger', 'data'),
     # INPUTS
     Input('upload_file', 'contents'),
     # Cancel the data upload
@@ -119,7 +140,6 @@ def update_table(contents, filename, last_modified):
     # STATES
     State('load-dataset-name', 'value'),
     State('uploaded_data', 'data'),
-    State('uploaded_data_name', 'data'),
     State('load-dataset-warning', 'className'),
     prevent_initial_call=True
 )
@@ -130,7 +150,6 @@ def open_popup(
     # STATES
     dataset_name,
     uploaded_data, 
-    uploaded_data_name,
     warning_class
 ):
 
@@ -138,7 +157,7 @@ def open_popup(
     pop_up_open_output = no_update # is the data upload popup is open
     warning_text_output = no_update # The text for the warning label
     warning_class_output = no_update # The class for the warning label
-    dataset_cards_container_output = no_update # The childrens for the dataset cards container
+    added_dataset_trigger = no_update # Triggers the build of the cards container
     
     trigger_id = ctx.triggered_id
     # Close the popup and saves the data.
@@ -171,11 +190,8 @@ def open_popup(
                     # add dataset
                     with session_maker() as session:
                         add_dataset(dataset_name, uploaded_data, session)
-                    dataset_cards_container_output = []
                     with session_maker() as session:
-                        num_of_datasets = datasets_count(session)
-                        if num_of_datasets > 0: 
-                            dataset_cards_container_output = [dataset_card(dataset.id, dataset.name) for dataset in get_all_datasets(session)]
+                        added_dataset_trigger = datasets_count(session) # If i added it will never be the same number as before
                 
                     pop_up_open_output = False 
                     warning_text_output = '' 
@@ -185,5 +201,54 @@ def open_popup(
         pop_up_open_output, # is the data upload popup is open
         warning_text_output, # The text for the warning label
         warning_class_output, # The class for the warning label
-        dataset_cards_container_output, # The childrens for the dataset cards container
+        added_dataset_trigger, # Triggers the build of the cards container
+    )
+
+
+# DELETE DATASET CALLBACK
+@dash.callback(
+    Output('delete-dataset-popup', 'is_open'),
+    Output('dataset_id_to_delete', 'value'),
+    Output('deleted_dataset_trigger', 'data'),
+    Input({'type':'dataset_card','id':ALL,'sub_type':'delete'}, 'n_clicks'),
+    Input('cancel-dataset-delete-btn', 'n_clicks'),
+    Input('delete-dataset-btn','n_clicks'),
+    State('dataset_id_to_delete', 'value'),
+    prevent_initial_call = True
+)
+def delete_dataset_popup(
+    n_clicks_dataset_cards,
+    __,
+    ___,
+    dataset_id_to_delete
+):
+    is_popup_open = no_update
+    dataset_id_to_delete_output = no_update
+    deleted_dataset_trigger = no_update # Triggers the build of the cards container
+
+    triggered_id = ctx.triggered_id
+    if triggered_id == 'cancel-dataset-delete-btn':
+        is_popup_open = False
+    elif isinstance(triggered_id, dict) and triggered_id.get('sub_type') and triggered_id.get('sub_type') == 'delete':
+        # Prevents update if the n_clicks started the function but wasn't clicked
+        # Happens when the card is created
+        for input_type in ctx.inputs_list:
+            if isinstance(input_type, list) and input_type[0]['id'].get('type') == 'dataset_card':
+                for index, input_ in enumerate(input_type):
+                    if input_['id'] == triggered_id:
+                        if n_clicks_dataset_cards[index] is None:
+                            raise PreventUpdate
+        is_popup_open = True
+        dataset_id_to_delete_output = triggered_id['id']
+    elif triggered_id == 'delete-dataset-btn':
+        with session_maker() as session:
+            delete_dataset(dataset_id_to_delete, session)
+            deleted_dataset_trigger = datasets_count(session) # If i deleted it will never be the same number as before
+        
+        is_popup_open = False
+
+    return (
+        is_popup_open,
+        dataset_id_to_delete_output,
+        deleted_dataset_trigger # Triggers the build of the cards container
     )
