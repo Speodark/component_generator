@@ -4,6 +4,59 @@ import dash_mantine_components as dmc
 from utilities.db import datasets_count, get_all_datasets
 from components import dataset_card
 
+
+def add_dataset_popup():
+    return dbc.Modal(
+        id='add-dataset-popup',
+        size='xl',
+        centered=True,
+        children=html.Div(
+            className='dashboard__data--load-popup',
+            children=[
+                html.Div(
+                    id='popup-file-data',
+                    className='dashboard__data--load-popup__data'
+                ),
+                html.Div(
+                    className='dashboard__data--load-popup__input-container',
+                    children=[
+                        html.Span(
+                            className='dashboard__data--load-popup__input-title',
+                            children='Dataset Name - '
+                        ),
+                        # The input for the component name
+                        dcc.Input(
+                            id='load-dataset-name',
+                            className='dashboard__data--load-popup__input',
+                            type="text",
+                            value='',
+                            autoComplete='off'
+                        ),
+                    ]
+                ),
+                # If while trying to create a component there's an error this will show the error
+                html.Span(
+                    id='load-dataset-warning',
+                    className='dashboard__data--load-popup__warning hide',
+                    children=''
+                ),
+                # Create the component
+                html.Button(
+                    id='load-data-btn',
+                    className='btn__green dashboard__data--load-popup__load',
+                    children='Load'
+                ),
+                # Cancel the component creation
+                html.Button(
+                    id='cancel-load-data-btn',
+                    className='btn__red dashboard__data--load-popup__cancel',
+                    children='Cancel'
+                )
+            ]
+        )
+    )
+
+
 def delete_dataset_popup():
     return dbc.Modal(
         id='delete-dataset-popup',
@@ -38,7 +91,7 @@ def delete_dataset_popup():
     )
 
 
-def rename_component_popup():
+def rename_dataset_popup():
     return dbc.Modal(
         id='rename-dataset-popup',
         size='lg',
@@ -80,6 +133,25 @@ def rename_component_popup():
                 )
             ]
         )
+    )
+
+
+def show_table_popup():
+    return dbc.Modal(
+        id='show-table-popup',
+        size='xl',
+        centered=True,
+        children=[
+            html.Div(
+                id='show-table-popup-children',
+                className='dashboard__show-table-popup'
+            ),
+            html.Button(
+                id='close-show-table-popup',
+                className='btn__red',
+                children='Close'
+            )
+        ],
     )
 
 def dashboard_data_tab(session_maker):
@@ -126,73 +198,10 @@ def dashboard_data_tab(session_maker):
 
 
                 # Pop Ups
-                dbc.Modal(
-                    id='add-dataset-popup',
-                    size='xl',
-                    centered=True,
-                    children=html.Div(
-                        className='dashboard__data--load-popup',
-                        children=[
-                            html.Div(
-                                id='popup-file-data',
-                                className='dashboard__data--load-popup__data'
-                            ),
-                            html.Div(
-                                className='dashboard__data--load-popup__input-container',
-                                children=[
-                                    html.Span(
-                                        className='dashboard__data--load-popup__input-title',
-                                        children='Dataset Name - '
-                                    ),
-                                    # The input for the component name
-                                    dcc.Input(
-                                        id='load-dataset-name',
-                                        className='dashboard__data--load-popup__input',
-                                        type="text",
-                                        value='',
-                                        autoComplete='off'
-                                    ),
-                                ]
-                            ),
-                            # If while trying to create a component there's an error this will show the error
-                            html.Span(
-                                id='load-dataset-warning',
-                                className='dashboard__data--load-popup__warning hide',
-                                children=''
-                            ),
-                            # Create the component
-                            html.Button(
-                                id='load-data-btn',
-                                className='btn__green dashboard__data--load-popup__load',
-                                children='Load'
-                            ),
-                            # Cancel the component creation
-                            html.Button(
-                                id='cancel-load-data-btn',
-                                className='btn__red dashboard__data--load-popup__cancel',
-                                children='Cancel'
-                            )
-                        ]
-                    )
-                ),
+                add_dataset_popup(),
                 delete_dataset_popup(),
-                rename_component_popup(),
-                dbc.Modal(
-                    id='show-table-popup',
-                    size='xl',
-                    centered=True,
-                    children=[
-                        html.Div(
-                            id='show-table-popup-children',
-                            className='dashboard__show-table-popup'
-                        ),
-                        html.Button(
-                            id='close-show-table-popup',
-                            className='btn__red',
-                            children='Close'
-                        )
-                    ],
-                ),
+                rename_dataset_popup(),
+                show_table_popup(),
                 # Data stores
                 dcc.Store(id='uploaded_data')
             ]

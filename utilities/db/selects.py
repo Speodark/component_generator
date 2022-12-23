@@ -32,3 +32,7 @@ def datasets_count(session: Session):
 
 def get_all_datasets(session: Session):
     return session.query(Datasets).order_by(desc(Datasets.created_at)).all()
+
+
+def get_dataset(dataset_id: int, session: Session):
+    return session.query(Datasets).filter_by(id=dataset_id).first()

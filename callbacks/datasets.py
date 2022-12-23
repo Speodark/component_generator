@@ -9,7 +9,7 @@ from datetime import datetime
 from pprint import pprint
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from utilities.db import dataset_name_exists, add_dataset, datasets_count, get_all_datasets, delete_dataset, rename_dataset
+from utilities.db import dataset_name_exists, add_dataset, datasets_count, get_all_datasets, delete_dataset, rename_dataset, get_dataset
 from components import dataset_card
 session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
 
@@ -103,6 +103,75 @@ def update_table(contents, filename, last_modified):
         return children, df.to_dict('records')
     
 
+@dash.callback(
+    Output('show-table-popup', 'is_open'),
+    Output('show-table-popup-children', 'children'),
+    Input('close-show-table-popup', 'n_clicks'),
+    Input({'type':'dataset_card','id':ALL,'sub_type':'table'}, 'n_clicks')
+)
+def open_see_table_popup(
+    _,
+    n_clicks_dataset_cards
+):
+    is_popup_open = no_update
+    popup_childrens = no_update
+
+    triggered_id = ctx.triggered_id
+    if triggered_id == 'close-show-table-popup':
+        is_popup_open = False
+        popup_childrens = []
+    elif isinstance(triggered_id, dict) and triggered_id.get('sub_type') and triggered_id.get('sub_type') == 'table':
+        # Prevents update if the n_clicks started the function but wasn't clicked
+        # Happens when the card is created
+        for input_type in ctx.inputs_list:
+            if isinstance(input_type, list) and input_type[0]['id'].get('type') == 'dataset_card':
+                for index, input_ in enumerate(input_type):
+                    if input_['id'] == triggered_id:
+                        if n_clicks_dataset_cards[index] is None:
+                            raise PreventUpdate
+                        else:
+                            dataset = None
+                            with session_maker() as session:
+                                dataset = get_dataset(triggered_id['id'], session)
+                            # Check we got the dataset from db
+                            if dataset is None:
+                                raise PreventUpdate
+                            popup_childrens = [
+                                # Display the filename and date
+                                html.Div(
+                                    className='dashboard__data--load-popup__data--title',
+                                    children=[
+                                        html.Span(
+                                            dataset.name,
+                                        ),
+                                        html.Span('-'),
+                                        html.Span(
+                                            dataset.created_at,
+                                        )
+                                    ]
+                                ),
+                                dash_table.DataTable(
+                                    data=dataset.data,
+                                    columns=[{"name": i, "id": i} for i in dataset.data[0].keys()],
+                                    sort_action="native",
+                                    editable=False,
+                                    cell_selectable=False,
+                                    page_size=10,
+                                    page_action="native",
+                                    style_table={
+                                        'overflow-x': 'scroll',
+                                        'width': '100%'
+                                    },
+                                )
+                            ]
+                            is_popup_open = True
+                break
+        
+
+    return (
+        is_popup_open,
+        popup_childrens
+    )
 
 @dash.callback(
     # the dataset cards container childrens
