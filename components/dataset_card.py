@@ -20,7 +20,7 @@ def dataset_card(id:int ,name: str):
                     html.Button(
                         children=html.I(className='pen-icon fa fa-pen'),
                         className='dataset-card__button',
-                        id={'type':'dataset_card','id':id,'sub_type':'edit'}
+                        id={'type':'dataset_card','id':id,'sub_type':'rename'}
                     ),
                     html.Button(
                         children=html.I(className='trash-icon fa fa-trash'),

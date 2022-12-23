@@ -37,6 +37,51 @@ def delete_dataset_popup():
         ),
     )
 
+
+def rename_component_popup():
+    return dbc.Modal(
+        id='rename-dataset-popup',
+        size='lg',
+        centered=True,
+        children=html.Div(
+            className='dashboard__add-component',
+            children=[
+                dcc.Store(id='dataset_id_to_rename'),
+                # The popup title
+                html.Span(
+                    className='dashboard__add-component--title',
+                    children='New Name'
+                ),
+                # The input for the component name
+                dcc.Input(
+                    id='rename-dataset-input',
+                    className='dashboard__add-component--input',
+                    type="text",
+                    value='',
+                    autoComplete='off'
+                ),
+                # If while trying to create a component there's an error this will show the error
+                html.Span(
+                    id='rename-dataset-warning',
+                    className='dashboard__add-component--warning hide',
+                    children=''
+                ),
+                # Create the component
+                html.Button(
+                    id='rename-dataset-confirm-btn',
+                    className='btn__green dashboard__add-component--create-btn',
+                    children='Rename'
+                ),
+                # Cancel the component creation
+                html.Button(
+                    id='rename-dataset-cancel-btn',
+                    className='btn__red dashboard__add-component--cancel-btn',
+                    children='Cancel'
+                )
+            ]
+        )
+    )
+
 def dashboard_data_tab(session_maker):
     datasets_cards = []
     num_of_datasets = None
@@ -70,7 +115,7 @@ def dashboard_data_tab(session_maker):
                 ),
                 dcc.Store(id='deleted_dataset_trigger',data=0),
                 dcc.Store(id='added_dataset_trigger',data=0),
-                dcc.Store(id='renamed_dataset_trigger',data=0),
+                dcc.Store(id='rename_dataset_trigger',data=0),
                 html.Div(
                     className='fill-parent-div dashboard__data-tab--datasets-container',
                     id='dataset-cards-container',
@@ -131,6 +176,7 @@ def dashboard_data_tab(session_maker):
                     )
                 ),
                 delete_dataset_popup(),
+                rename_component_popup(),
                 dbc.Modal(
                     id='show-table-popup',
                     size='xl',
