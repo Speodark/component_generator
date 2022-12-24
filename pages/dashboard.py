@@ -28,23 +28,7 @@ def dashboard_args(session_maker):
         grow=True,
         children=[
             dashboard_data_tab(session_maker),
-            dmc.Tab(
-                label="Graph Traces", 
-                children=html.Div(
-                    className='center_items_vertical',
-                    children=[
-                        html.Div(
-                            className='dashboard__traces',
-                            children=[]
-                        ),
-                        html.Button(
-                            id='add-trace',
-                            className='btn__blue',
-                            children='Add Trace'
-                        )
-                    ]
-                )
-            ),
+            dashboard_traces_tab(session_maker),
             dmc.Tab(
                 id='args-tab',
                 label="args", 

@@ -51,6 +51,11 @@ body {
   flex-direction: column;
   align-items: center; }
 
+.center_items_horizontal {
+  display: flex;
+  align-items: center;
+  justify-content: center; }
+
 .fill-parent-div {
   width: 100%;
   height: 100%; }
@@ -223,6 +228,56 @@ body {
       transition: color 0.5s; }
       .dataset-card__button .trash-icon:hover {
         color: red; }
+
+.create-trace {
+  padding: 1.5rem;
+  font-size: 1.5rem;
+  display: grid;
+  grid-template-rows: repeat(3, mimax(0, 1fr)) minmax(0, 1fr) max-content;
+  gap: 0.8rem; }
+  .create-trace .dash-dropdown {
+    height: 100%; }
+    .create-trace .dash-dropdown .Select {
+      height: 100%; }
+      .create-trace .dash-dropdown .Select .Select-control {
+        height: 100%; }
+  .create-trace__dropdown {
+    width: 15rem; }
+    .create-trace__dropdown .Select-value {
+      display: flex;
+      align-items: center; }
+  .create-trace__title {
+    font-weight: bold;
+    text-align: center;
+    font-size: 2rem;
+    grid-row: 1/2; }
+  .create-trace__type {
+    grid-row: 2/3; }
+    .create-trace__type > *:not(:last-child) {
+      margin-right: 0.6rem; }
+  .create-trace__name {
+    grid-row: 3/4; }
+    .create-trace__name > *:not(:last-child) {
+      margin-right: 0.6rem; }
+  .create-trace__dataset {
+    grid-row: 4/5; }
+    .create-trace__dataset > *:not(:last-child) {
+      margin-right: 0.6rem; }
+  .create-trace__warning {
+    grid-row: 5/6;
+    grid-column: 1/2;
+    place-self: center;
+    color: red; }
+  .create-trace__create-btn {
+    grid-row: 5/6;
+    grid-column: 1/2;
+    width: max-content;
+    place-self: end; }
+  .create-trace__cancel-btn {
+    grid-row: 5/6;
+    grid-column: 1/2;
+    width: max-content;
+    place-self: start; }
 
 .dashboard {
   height: 100%;

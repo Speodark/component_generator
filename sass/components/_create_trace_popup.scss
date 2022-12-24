@@ -1,0 +1,75 @@
+.create-trace {
+    padding: 1.5rem;
+    font-size: 1.5rem;
+    display: grid;
+    grid-template-rows: repeat(3, mimax(0, 1fr)) minmax(0, 1fr) max-content;
+    gap: 0.8rem;
+
+    & .dash-dropdown{
+        height: 100%;
+        & .Select {
+            height: 100%;
+            & .Select-control {
+                height: 100%;
+            }
+        }
+    }
+
+    &__dropdown {
+        width: 15rem;
+        & .Select-value {
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    &__title {
+        font-weight: bold;
+        text-align: center;
+        font-size: 2rem;
+        grid-row: 1/2;
+    }
+
+    &__type {
+        & > *:not(:last-child) {
+            margin-right: 0.6rem;
+        }
+        grid-row: 2/3;
+    }
+
+    &__name {
+        & > *:not(:last-child) {
+            margin-right: 0.6rem;
+        }
+        grid-row: 3/4;
+    }
+
+    &__dataset {
+        & > *:not(:last-child) {
+            margin-right: 0.6rem;
+        }
+        grid-row: 4/5;
+    }
+
+    &__warning {
+        grid-row: 5/6;
+        grid-column: 1/2;
+        place-self: center;
+        color: red;
+    }
+
+    &__create-btn {
+        grid-row: 5/6;
+        grid-column: 1/2;
+        width: max-content;
+        place-self: end;
+    }
+
+    &__cancel-btn {
+        grid-row: 5/6;
+        grid-column: 1/2;
+        width: max-content;
+        place-self: start;
+    }
+
+}
