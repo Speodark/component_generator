@@ -1,9 +1,17 @@
 import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
 from dash import html, dcc
+from utilities.db import get_all_datasets
 
 
-def create_trace_popup():
+def create_trace_popup(session_maker):
+    datasets_name_id = []
+    with session_maker() as session:
+        datasets = get_all_datasets(session)
+        datasets_name_id = [
+            {'label': dataset.name, 'value': dataset.id}
+            for dataset in datasets
+        ]
     return dbc.Modal(
         id='create-trace-popup',
         size='lg',
@@ -80,11 +88,8 @@ def create_trace_popup():
                             children='-'
                         ),
                         dcc.Dropdown(
-                            options=[
-                                {'label': 'bar', 'value': 'bar'},
-                                {'label': 'line', 'value': 'line'} 
-                            ],
-                            value='line',
+                            options=datasets_name_id,
+                            value=None,
                             className='create-trace__dropdown',
                             id='traces-dataset-dropdown',
                         )
@@ -123,7 +128,7 @@ def dashboard_traces_tab(session_maker):
                     children='Add Trace'
                 ),
                 # POPUPS
-                create_trace_popup(),
+                create_trace_popup(session_maker),
             ]
         )
     )

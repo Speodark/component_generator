@@ -1,4 +1,4 @@
-from sqlalchemy import JSON
+from sqlalchemy import JSON, exists
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import desc
 from .models import Traces, Components, Datasets
@@ -36,3 +36,8 @@ def get_all_datasets(session: Session):
 
 def get_dataset(dataset_id: int, session: Session):
     return session.query(Datasets).filter_by(id=dataset_id).first()
+
+# Traces
+def trace_name_exists(component_id: int, trace_name: str, session: Session) -> bool:
+    result = session.query(exists().where(Traces.component_id == component_id).where(Traces.trace_name == trace_name)).scalar()
+    return result
