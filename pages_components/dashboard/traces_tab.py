@@ -114,6 +114,85 @@ def create_trace_popup(session_maker):
     )
 
 
+def delete_trace_popup():
+    return dbc.Modal(
+        id='delete-trace-popup',
+        size='sm',
+        centered=True,
+        children=html.Div(
+            className='dashboard__delete-popup',
+            children=[
+                dcc.Store(id='trace_id_to_delete'),
+                html.Span(
+                    className='dashboard__delete-popup--title',
+                    children='Are you sure you want to delete the Trace?'
+                ),
+                html.Span(
+                    className='dashboard__delete-popup--warning',
+                    children="You won't be able to retrieve the Trace information!"
+                ),
+                # Delete the component
+                html.Button(
+                    id='delete-trace-btn',
+                    className='btn__red dashboard__delete-popup--delete',
+                    children='Delete'
+                ),
+                # Cancel
+                html.Button(
+                    id='cancel-trace-delete-btn',
+                    className='btn__blue dashboard__delete-popup--cancel',
+                    children='Cancel'
+                ),
+            ]
+        ),
+    )
+
+
+def rename_trace_popup():
+    return dbc.Modal(
+        id='rename-dataset-popup',
+        size='lg',
+        centered=True,
+        children=html.Div(
+            className='dashboard__add-component',
+            children=[
+                dcc.Store(id='dataset_id_to_rename'),
+                # The popup title
+                html.Span(
+                    className='dashboard__add-component--title',
+                    children='New Name'
+                ),
+                # The input for the component name
+                dcc.Input(
+                    id='rename-dataset-input',
+                    className='dashboard__add-component--input',
+                    type="text",
+                    value='',
+                    autoComplete='off'
+                ),
+                # If while trying to create a component there's an error this will show the error
+                html.Span(
+                    id='rename-dataset-warning',
+                    className='dashboard__add-component--warning hide',
+                    children=''
+                ),
+                # Create the component
+                html.Button(
+                    id='rename-dataset-confirm-btn',
+                    className='btn__green dashboard__add-component--create-btn',
+                    children='Rename'
+                ),
+                # Cancel the component creation
+                html.Button(
+                    id='rename-dataset-cancel-btn',
+                    className='btn__red dashboard__add-component--cancel-btn',
+                    children='Cancel'
+                )
+            ]
+        )
+    )
+
+
 def dashboard_traces_tab(session_maker):
     traces_cards = []
     num_of_datasets = None
@@ -139,6 +218,8 @@ def dashboard_traces_tab(session_maker):
                 ),
                 # POPUPS
                 create_trace_popup(session_maker),
+                dcc.Store(id='deleted_trace_trigger'),
+                delete_trace_popup()
             ]
         )
     )

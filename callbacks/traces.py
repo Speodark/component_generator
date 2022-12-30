@@ -5,7 +5,16 @@ from datetime import datetime
 from components import *
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from utilities.db import get_all_datasets, trace_name_exists, add_trace, traces_count, get_all_traces, get_newest_component
+from utilities.db import (
+    get_all_datasets, 
+    trace_name_exists, 
+    add_trace, 
+    traces_count, 
+    get_all_traces, 
+    get_newest_component, 
+    delete_trace,
+    component_traces_count
+)
 from components.charts import charts_dict
 import plotly.graph_objects as go
 
@@ -22,6 +31,8 @@ chart_type_to_class = {
     Output('traces-dataset-dropdown', 'options'),
     Output('new-trace-name-warning', 'children'),
     Output('new-trace-name-warning', 'className'),
+    Output('traces-dataset-dropdown', 'value'),
+    Output('new-trace-name', 'value'),
     Output('added-trace-trigger','data'),
     Input('add-trace', 'n_clicks'),
     Input('cancel-trace', 'n_clicks'),
@@ -48,6 +59,8 @@ def create_trace_popup(
     datasets_dropdown_options_output = no_update # update the datasets dropdown value
     warning_text_output = no_update # The warning text
     warning_class_output = no_update # The warning div class
+    traces_dataset_dropdown_value = no_update # The value of the datasets dropdown, we need to set to none to restart the choice
+    new_trace_name_output = no_update # The new trace name input, to empty when creating new trace
     added_trace_trigger_data_output = no_update # Triggers the rebuild of the traces cards
 
     triggered = ctx.triggered_id
@@ -88,24 +101,81 @@ def create_trace_popup(
                 added_trace_trigger_data_output = datetime.now()
                 warning_text_output = ''
                 warning_class_output = warning_class if 'hide' in warning_class else warning_class + ' hide' 
+                traces_dataset_dropdown_value = None
+                new_trace_name_output = ''
 
     return (
         is_open_output,
         datasets_dropdown_options_output,
         warning_text_output, # The warning text
         warning_class_output, # The warning div class
+        traces_dataset_dropdown_value,
+        new_trace_name_output,
         added_trace_trigger_data_output
+    )
+
+
+# DELETE DATASET CALLBACK
+@dash.callback(
+    Output('delete-trace-popup', 'is_open'),
+    Output('trace_id_to_delete', 'value'),
+    Output('deleted_trace_trigger', 'data'),
+    Input({'type':'trace_card','id':ALL,'sub_type':'delete'}, 'n_clicks'),
+    Input('cancel-trace-delete-btn', 'n_clicks'),
+    Input('delete-trace-btn','n_clicks'),
+    State('trace_id_to_delete', 'value'),
+    State('components-dropdown', 'value'),
+    prevent_initial_call = True
+)
+def delete_dataset_popup(
+    n_clicks_trace_cards,
+    __,
+    ___,
+    trace_id_to_delete,
+    component_id
+):
+    is_popup_open = no_update
+    trace_id_to_delete_output = no_update
+    deleted_trace_trigger = no_update # Triggers the build of the cards container
+
+    triggered_id = ctx.triggered_id
+    if triggered_id == 'cancel-trace-delete-btn':
+        is_popup_open = False
+    elif isinstance(triggered_id, dict) and triggered_id.get('sub_type') and triggered_id.get('sub_type') == 'delete':
+        # Prevents update if the n_clicks started the function but wasn't clicked
+        # Happens when the card is created
+        for input_type in ctx.inputs_list:
+            if isinstance(input_type, list) and input_type[0]['id'].get('type') == 'trace_card':
+                for index, input_ in enumerate(input_type):
+                    if input_['id'] == triggered_id:
+                        if n_clicks_trace_cards[index] is None:
+                            raise PreventUpdate
+        is_popup_open = True
+        trace_id_to_delete_output = triggered_id['id']
+    elif triggered_id == 'delete-trace-btn':
+        with session_maker() as session:
+            delete_trace(trace_id_to_delete, session)
+            deleted_trace_trigger = component_traces_count(component_id, session) # If i deleted it will never be the same number as before
+        
+        is_popup_open = False
+
+    return (
+        is_popup_open,
+        trace_id_to_delete_output,
+        deleted_trace_trigger # Triggers the build of the cards container
     )
 
 
 @dash.callback(
     Output('traces-container', 'children'),
     Input('components-dropdown', 'value'),
-    Input('added-trace-trigger','data')
+    Input('added-trace-trigger','data'),
+    Input('deleted_trace_trigger', 'data')
 )
 def update_traces_container(
     component_id,
-    _
+    _,
+    __
 ):
     traces_cards = []
     num_of_datasets = None

@@ -48,5 +48,9 @@ def traces_count(session: Session):
     num_rows = session.query(Traces).count()
     return num_rows
 
-def get_all_traces(component_id, session: Session):
+def component_traces_count(component_id: int, session: Session):
+    num_rows = session.query(Traces).filter(Traces.component_id == component_id).count()
+    return num_rows
+
+def get_all_traces(component_id: int, session: Session):
     return session.query(Traces).filter(Traces.component_id == component_id).order_by(desc(Traces.created_at)).all()

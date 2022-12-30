@@ -16,3 +16,10 @@ def delete_dataset(dataset_id: int, session: Session) -> bool:
     if dataset:
         session.delete(dataset)
         session.commit()
+
+
+def delete_trace(trace_id: int, session: Session) -> bool:
+    trace = session.query(Traces).filter_by(id=trace_id).first()
+    if trace:
+        session.delete(trace)
+        session.commit()
