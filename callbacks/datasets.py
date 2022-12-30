@@ -10,7 +10,7 @@ from pprint import pprint
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from utilities.db import dataset_name_exists, add_dataset, datasets_count, get_all_datasets, delete_dataset, rename_dataset, get_dataset
-from components import dataset_card
+from components import trace_dataset_card
 session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
 
 
@@ -190,7 +190,7 @@ def update_datasets_container(
     with session_maker() as session:
         num_of_datasets = datasets_count(session)
         if num_of_datasets > 0: 
-            dataset_cards_container_output = [dataset_card(dataset.id, dataset.name) for dataset in get_all_datasets(session)]
+            dataset_cards_container_output = [trace_dataset_card(dataset.id, dataset.name) for dataset in get_all_datasets(session)]
 
     return dataset_cards_container_output
 

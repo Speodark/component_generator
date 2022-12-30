@@ -1,8 +1,8 @@
-"""fixed the duplicated name
+"""created
 
-Revision ID: af6aa91f5090
+Revision ID: c00792d2243c
 Revises: 
-Create Date: 2022-12-25 02:05:10.909409
+Create Date: 2022-12-30 15:34:06.671018
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'af6aa91f5090'
+revision = 'c00792d2243c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -40,8 +40,8 @@ def upgrade() -> None:
     sa.Column('dataset_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('args', sa.JSON(), nullable=True),
-    sa.ForeignKeyConstraint(['component_id'], ['components.id'], ),
-    sa.ForeignKeyConstraint(['dataset_id'], ['datasets.id'], ),
+    sa.ForeignKeyConstraint(['component_id'], ['components.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['dataset_id'], ['datasets.id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('component_id', 'trace_name', name='uix_1')
     )

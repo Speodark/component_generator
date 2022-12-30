@@ -1,10 +1,13 @@
 from dash import Input, Output, dcc, html, ctx, no_update, ALL, dash_table, State
 import dash
 from dash.exceptions import PreventUpdate
+from datetime import datetime
 from components import *
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from utilities.db import get_all_datasets, trace_name_exists
+from utilities.db import get_all_datasets, trace_name_exists, add_trace, traces_count, get_all_traces, get_newest_component
+from components.charts import charts_dict
+import plotly.graph_objects as go
 
 session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
 
@@ -19,12 +22,15 @@ chart_type_to_class = {
     Output('traces-dataset-dropdown', 'options'),
     Output('new-trace-name-warning', 'children'),
     Output('new-trace-name-warning', 'className'),
+    Output('added-trace-trigger','data'),
     Input('add-trace', 'n_clicks'),
     Input('cancel-trace', 'n_clicks'),
     Input('create-trace', 'n_clicks'),
     State('new-trace-name-warning', 'className'),
     State('new-trace-name', 'value'),
     State('components-dropdown', 'value'),
+    State('traces-type-dropdown', 'value'),
+    State('traces-dataset-dropdown', 'value'),
     prevent_initial_call = True
 )
 def create_trace_popup(
@@ -35,11 +41,14 @@ def create_trace_popup(
     warning_class,
     trace_name,
     component_id,
+    trace_type,
+    dataset_id
 ):
     is_open_output = no_update # is the popup open?
     datasets_dropdown_options_output = no_update # update the datasets dropdown value
     warning_text_output = no_update # The warning text
     warning_class_output = no_update # The warning div class
+    added_trace_trigger_data_output = no_update # Triggers the rebuild of the traces cards
 
     triggered = ctx.triggered_id
 
@@ -72,14 +81,37 @@ def create_trace_popup(
                 warning_text_output = 'This name is already taken'
                 warning_class_output = warning_class.replace('hide', '').strip()
             else:
-                args_dict = {
-                    'name': trace_name
-                }
+                fig_json = getattr(go, trace_type)(name=trace_name).to_plotly_json()
+                with session_maker() as session:
+                    add_trace(trace_name, component_id, fig_json, session, dataset_id=dataset_id)
                 is_open_output = False
+                added_trace_trigger_data_output = datetime.now()
+                warning_text_output = ''
+                warning_class_output = warning_class if 'hide' in warning_class else warning_class + ' hide' 
 
     return (
         is_open_output,
         datasets_dropdown_options_output,
         warning_text_output, # The warning text
         warning_class_output, # The warning div class
+        added_trace_trigger_data_output
     )
+
+
+@dash.callback(
+    Output('traces-container', 'children'),
+    Input('components-dropdown', 'value'),
+    Input('added-trace-trigger','data')
+)
+def update_traces_container(
+    component_id,
+    _
+):
+    traces_cards = []
+    num_of_datasets = None
+    with session_maker() as session:
+        num_of_datasets = traces_count(session)
+        if num_of_datasets > 0: 
+            traces_cards = [trace_dataset_card(trace.id, trace.trace_name, 'trace_card') for trace in get_all_traces(component_id, session)]
+    
+    return traces_cards

@@ -1,8 +1,9 @@
 import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
 from dash import html, dcc
-from utilities.db import get_all_datasets
-
+from utilities.db import get_all_datasets, traces_count, get_all_traces, get_newest_component
+from components.charts import charts_dict
+from components import trace_dataset_card
 
 def create_trace_popup(session_maker):
     datasets_name_id = []
@@ -19,6 +20,7 @@ def create_trace_popup(session_maker):
         children=html.Div(
             className='create-trace',
             children=[
+                dcc.Store(id='added-trace-trigger', data=0),
                 # TITLE
                 html.Span(
                     className='create-trace__title',
@@ -38,10 +40,10 @@ def create_trace_popup(session_maker):
                         ),
                         dcc.Dropdown(
                             options=[
-                                {'label': 'bar', 'value': 'bar'},
-                                {'label': 'line', 'value': 'line'} 
+                                {'label': chart_type, 'value': chart_type}
+                                for chart_type in charts_dict.keys()
                             ],
-                            value='line',
+                            value=list(charts_dict.keys())[0],
                             className='create-trace__dropdown',
                             id='traces-type-dropdown',
                             clearable=False,
@@ -113,19 +115,27 @@ def create_trace_popup(session_maker):
 
 
 def dashboard_traces_tab(session_maker):
+    traces_cards = []
+    num_of_datasets = None
+    with session_maker() as session:
+        num_of_datasets = traces_count(session)
+        if num_of_datasets > 0: 
+            component_id = get_newest_component(session).id
+            traces_cards = [trace_dataset_card(trace.id, trace.trace_name, 'trace_card') for trace in get_all_traces(component_id, session)]
     return dmc.Tab(
         label="Graph Traces", 
         children=html.Div(
             className='center_items_vertical',
             children=[
-                html.Div(
-                    className='dashboard__traces',
-                    children=[]
-                ),
                 html.Button(
                     id='add-trace',
                     className='btn__blue',
                     children='Add Trace'
+                ),
+                html.Div(
+                    className='fill-parent-div dashboard__traces',
+                    id='traces-container',
+                    children=traces_cards
                 ),
                 # POPUPS
                 create_trace_popup(session_maker),

@@ -2,7 +2,7 @@ from dash import html, dcc
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 from utilities.db import datasets_count, get_all_datasets
-from components import dataset_card
+from components import trace_dataset_card
 
 
 def add_dataset_popup():
@@ -160,7 +160,7 @@ def dashboard_data_tab(session_maker):
     with session_maker() as session:
         num_of_datasets = datasets_count(session)
         if num_of_datasets > 0: 
-            datasets_cards = [dataset_card(dataset.id, dataset.name) for dataset in get_all_datasets(session)]
+            datasets_cards = [trace_dataset_card(dataset.id, dataset.name) for dataset in get_all_datasets(session)]
     return dmc.Tab(
         label="Data", 
         children=html.Div(

@@ -242,7 +242,7 @@ body {
       .create-trace .dash-dropdown .Select .Select-control {
         height: 100%; }
   .create-trace__dropdown {
-    width: 15rem; }
+    width: 19rem; }
     .create-trace__dropdown .Select-value {
       display: flex;
       align-items: center; }
@@ -294,6 +294,10 @@ body {
   .dashboard__args {
     grid-row: 1/-1;
     grid-column: 1/2; }
+  .dashboard__traces {
+    margin-top: 2rem; }
+    .dashboard__traces > *:not(:last-child) {
+      margin-bottom: 1.5rem; }
   .dashboard__data-tab--datasets-container {
     margin-top: 2rem; }
     .dashboard__data-tab--datasets-container > *:not(:last-child) {
@@ -359,7 +363,6 @@ body {
   .dashboard__components {
     grid-row: 1/2;
     grid-column: 2/3;
-    overflow: hidden;
     display: grid;
     grid-template-rows: min-content;
     grid-template-columns: minmax(0, 0.8fr) minmax(0, 0.1fr) minmax(0, 0.1fr) minmax(0, 0.1fr) minmax(0, 0.1fr) minmax(0, 0.1fr);

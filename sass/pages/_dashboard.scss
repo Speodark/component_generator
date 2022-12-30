@@ -21,6 +21,13 @@
         grid-column: 1/2;
     }
 
+    &__traces {
+        margin-top: 2rem;
+        & > *:not(:last-child) {
+            margin-bottom: 1.5rem;
+        }
+    }
+
     &__data-tab {
         &--datasets-container {
             margin-top: 2rem;
@@ -123,7 +130,6 @@
     &__components {
         grid-row: 1/2;
         grid-column: 2/3;
-        overflow: hidden;
         display: grid;
         grid-template-rows: min-content;
         grid-template-columns: minmax(0,0.8fr) minmax(0,0.1fr) minmax(0,0.1fr) minmax(0,0.1fr) minmax(0,0.1fr) minmax(0,0.1fr);

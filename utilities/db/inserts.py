@@ -2,8 +2,8 @@ from sqlalchemy import JSON
 from sqlalchemy.orm import Session
 from .models import Traces, Components, Datasets
 
-def add_trace(component_id: int, args: JSON, session: Session) -> None:
-    trace = Traces(component_id=component_id, args=args)
+def add_trace(trace_name: str ,component_id: int, args: JSON, session: Session, dataset_id: int = None) -> None:
+    trace = Traces(component_id=component_id, trace_name=trace_name, dataset_id=dataset_id, args=args)
     session.add(trace)
     session.commit()
     
