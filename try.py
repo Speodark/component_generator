@@ -10,5 +10,6 @@ json_data = go.Bar(x=x, y=y).to_plotly_json()
 
 print(json_data)
 
-fig = go.Figure(json_data)
+fig = go.Figure([json_data,json_data])
 print(fig)
+fig.show()

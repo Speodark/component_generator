@@ -150,13 +150,13 @@ def delete_trace_popup():
 
 def rename_trace_popup():
     return dbc.Modal(
-        id='rename-dataset-popup',
+        id='rename-trace-popup',
         size='lg',
         centered=True,
         children=html.Div(
             className='dashboard__add-component',
             children=[
-                dcc.Store(id='dataset_id_to_rename'),
+                dcc.Store(id='trace_id_to_rename'),
                 # The popup title
                 html.Span(
                     className='dashboard__add-component--title',
@@ -164,7 +164,7 @@ def rename_trace_popup():
                 ),
                 # The input for the component name
                 dcc.Input(
-                    id='rename-dataset-input',
+                    id='rename-trace-input',
                     className='dashboard__add-component--input',
                     type="text",
                     value='',
@@ -172,19 +172,19 @@ def rename_trace_popup():
                 ),
                 # If while trying to create a component there's an error this will show the error
                 html.Span(
-                    id='rename-dataset-warning',
+                    id='rename-trace-warning',
                     className='dashboard__add-component--warning hide',
                     children=''
                 ),
                 # Create the component
                 html.Button(
-                    id='rename-dataset-confirm-btn',
+                    id='rename-trace-confirm-btn',
                     className='btn__green dashboard__add-component--create-btn',
                     children='Rename'
                 ),
                 # Cancel the component creation
                 html.Button(
-                    id='rename-dataset-cancel-btn',
+                    id='rename-trace-cancel-btn',
                     className='btn__red dashboard__add-component--cancel-btn',
                     children='Cancel'
                 )
@@ -219,7 +219,9 @@ def dashboard_traces_tab(session_maker):
                 # POPUPS
                 create_trace_popup(session_maker),
                 dcc.Store(id='deleted_trace_trigger'),
-                delete_trace_popup()
+                delete_trace_popup(),
+                dcc.Store(id='rename_trace_trigger'),
+                rename_trace_popup()
             ]
         )
     )
