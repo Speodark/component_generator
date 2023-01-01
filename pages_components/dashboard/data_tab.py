@@ -161,49 +161,44 @@ def dashboard_data_tab(session_maker):
         num_of_datasets = datasets_count(session)
         if num_of_datasets > 0: 
             datasets_cards = [trace_dataset_card(dataset.id, dataset.name) for dataset in get_all_datasets(session)]
-    return dmc.Tab(
-        label="Data", 
-        children=html.Div(
-            className='center_items_vertical',
-            children=[
-                dcc.Upload(
-                    id='upload_file',
-                    children=html.Div(
-                        children=[
-                            'Drag and Drop or ',
-                            html.A('Select Files')
-                        ]
-                    ),
-                    style={
-                        'width': '100%',
-                        'height': '60px',
-                        'lineHeight': '60px',
-                        'borderWidth': '1px',
-                        'borderStyle': 'dashed',
-                        'borderRadius': '5px',
-                        'textAlign': 'center',
-                        'margin': '10px'
-                    },
+    return html.Div(
+        className='center_items_vertical dashboard__data-tab',
+        children=[
+            dcc.Upload(
+                id='upload_file',
+                children=html.Div(
+                    children=[
+                        'Drag and Drop or ',
+                        html.A('Select Files')
+                    ]
                 ),
-                dcc.Store(id='deleted_dataset_trigger',data=0),
-                dcc.Store(id='added_dataset_trigger',data=0),
-                dcc.Store(id='rename_dataset_trigger',data=0),
-                html.Div(
-                    className='fill-parent-div dashboard__data-tab--datasets-container',
-                    id='dataset-cards-container',
-                    children=datasets_cards
-                ),
+                style={
+                    'width': '100%',
+                    'height': '60px',
+                    'lineHeight': '60px',
+                    'borderWidth': '1px',
+                    'borderStyle': 'dashed',
+                    'borderRadius': '5px',
+                    'textAlign': 'center',
+                    'margin': '10px'
+                },
+            ),
+            dcc.Store(id='deleted_dataset_trigger',data=0),
+            dcc.Store(id='added_dataset_trigger',data=0),
+            dcc.Store(id='rename_dataset_trigger',data=0),
+            html.Div(
+                className='fill-parent-div dashboard__data-tab--datasets-container',
+                id='dataset-cards-container',
+                children=datasets_cards
+            ),
 
 
-
-
-                # Pop Ups
-                add_dataset_popup(),
-                delete_dataset_popup(),
-                rename_dataset_popup(),
-                show_table_popup(),
-                # Data stores
-                dcc.Store(id='uploaded_data')
-            ]
-        )
+            # Pop Ups
+            add_dataset_popup(),
+            delete_dataset_popup(),
+            rename_dataset_popup(),
+            show_table_popup(),
+            # Data stores
+            dcc.Store(id='uploaded_data')
+        ]
     )

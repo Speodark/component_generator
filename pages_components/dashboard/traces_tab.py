@@ -201,27 +201,24 @@ def dashboard_traces_tab(session_maker):
         if num_of_datasets > 0: 
             component_id = get_newest_component(session).id
             traces_cards = [trace_dataset_card(trace.id, trace.trace_name, 'trace_card') for trace in get_all_traces(component_id, session)]
-    return dmc.Tab(
-        label="Graph Traces", 
-        children=html.Div(
-            className='center_items_vertical',
-            children=[
-                html.Button(
-                    id='add-trace',
-                    className='btn__blue',
-                    children='Add Trace'
-                ),
-                html.Div(
-                    className='fill-parent-div dashboard__traces',
-                    id='traces-container',
-                    children=traces_cards
-                ),
-                # POPUPS
-                create_trace_popup(session_maker),
-                dcc.Store(id='deleted_trace_trigger'),
-                delete_trace_popup(),
-                dcc.Store(id='rename_trace_trigger'),
-                rename_trace_popup()
-            ]
-        )
+    return html.Div(
+        className='center_items_vertical dashboard__traces-tab',
+        children=[
+            html.Button(
+                id='add-trace',
+                className='btn__blue',
+                children='Add Trace'
+            ),
+            html.Div(
+                className='fill-parent-div dashboard__traces-tab--traces-container',
+                id='traces-container',
+                children=traces_cards
+            ),
+            # POPUPS
+            create_trace_popup(session_maker),
+            dcc.Store(id='deleted_trace_trigger'),
+            delete_trace_popup(),
+            dcc.Store(id='rename_trace_trigger'),
+            rename_trace_popup()
+        ]
     )

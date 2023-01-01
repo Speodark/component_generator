@@ -15,20 +15,23 @@
         grid-column: 2/3;
     }
 
-
     &__args {
         grid-row: 1/-1;
         grid-column: 1/2;
     }
 
-    &__traces {
+    &__traces-tab {
         margin-top: 2rem;
-        & > *:not(:last-child) {
-            margin-bottom: 1.5rem;
+        &--traces-container {
+            margin-top: 2rem;
+            & > *:not(:last-child) {
+                margin-bottom: 1.5rem;
+            }
         }
     }
 
     &__data-tab {
+        margin-top: 2rem;
         &--datasets-container {
             margin-top: 2rem;
             & > *:not(:last-child) {
@@ -37,18 +40,17 @@
         }
     }
 
-    
     &__data {
         &--load-popup {
             width: 98%;
             margin: 1%;
             display: grid;
             grid-template-rows: minmax(0, 1fr) min-content min-content min-content;
-            grid-template-columns: minmax(0,1fr);
+            grid-template-columns: minmax(0, 1fr);
             gap: 1rem;
             &__data {
                 grid-row: 1/2;
-                
+
                 &--title {
                     display: flex;
                     justify-content: center;
@@ -57,13 +59,13 @@
                     & > Span {
                         font-weight: bold;
                         font-size: 1.8rem;
-                        
+
                         &:not(:last-child) {
                             margin-right: 0.5rem;
                         }
                     }
                 }
-    
+
                 & .dash-spreadsheet-inner {
                     min-height: unset !important;
                     min-width: unset !important;
@@ -71,8 +73,9 @@
                 & .dash-fixed-content {
                     margin: 0 !important;
                     padding: 1rem;
-    
-                    & .dash-cell, & .dash-header {
+
+                    & .dash-cell,
+                    & .dash-header {
                         font-size: 1.5rem;
                         padding: 5px !important;
                         text-align: center !important;
@@ -120,22 +123,22 @@
                 grid-column: 1/2;
                 width: max-content;
                 place-self: start;
-                
             }
-            
         }
     }
-    
 
     &__components {
         grid-row: 1/2;
         grid-column: 2/3;
         display: grid;
         grid-template-rows: min-content;
-        grid-template-columns: minmax(0,0.8fr) minmax(0,0.1fr) minmax(0,0.1fr) minmax(0,0.1fr) minmax(0,0.1fr) minmax(0,0.1fr);
+        grid-template-columns: minmax(0, 0.8fr) minmax(0, 0.1fr) minmax(0, 0.1fr) minmax(0, 0.1fr) minmax(0, 0.1fr) minmax(
+                0,
+                0.1fr
+            );
         gap: 2rem;
 
-        & .dash-dropdown{
+        & .dash-dropdown {
             height: 100%;
             & .Select {
                 height: 100%;
@@ -241,4 +244,3 @@
         }
     }
 }
-

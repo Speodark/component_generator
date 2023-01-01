@@ -21,20 +21,22 @@ dash.register_page(
 session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
 
 
-
-
 def dashboard_args():
     return dmc.Tabs(
-        grow=True,
         children=[
-            dashboard_data_tab(session_maker),
-            dashboard_traces_tab(session_maker),
-            dmc.Tab(
-                id='args-tab',
-                label="args", 
-                children=[]
+            dmc.TabsList(
+                [
+                    dmc.Tab("Data", value='Data'),
+                    dmc.Tab("Traces", value='Traces'),
+                    dmc.Tab("Settings", value='Settings'),
+                ],
+                grow=True
             ),
-        ]
+            dmc.TabsPanel(dashboard_data_tab(session_maker), value="Data"),
+            dmc.TabsPanel(dashboard_traces_tab(session_maker), value="Traces"),
+            dmc.TabsPanel([], value="Settings"),
+        ],
+        value='Data'
     )
 
 

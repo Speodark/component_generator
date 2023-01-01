@@ -294,14 +294,18 @@ body {
   .dashboard__args {
     grid-row: 1/-1;
     grid-column: 1/2; }
-  .dashboard__traces {
+  .dashboard__traces-tab {
     margin-top: 2rem; }
-    .dashboard__traces > *:not(:last-child) {
-      margin-bottom: 1.5rem; }
-  .dashboard__data-tab--datasets-container {
+    .dashboard__traces-tab--traces-container {
+      margin-top: 2rem; }
+      .dashboard__traces-tab--traces-container > *:not(:last-child) {
+        margin-bottom: 1.5rem; }
+  .dashboard__data-tab {
     margin-top: 2rem; }
-    .dashboard__data-tab--datasets-container > *:not(:last-child) {
-      margin-bottom: 1.5rem; }
+    .dashboard__data-tab--datasets-container {
+      margin-top: 2rem; }
+      .dashboard__data-tab--datasets-container > *:not(:last-child) {
+        margin-bottom: 1.5rem; }
   .dashboard__data--load-popup {
     width: 98%;
     margin: 1%;
@@ -326,7 +330,8 @@ body {
       .dashboard__data--load-popup__data .dash-fixed-content {
         margin: 0 !important;
         padding: 1rem; }
-        .dashboard__data--load-popup__data .dash-fixed-content .dash-cell, .dashboard__data--load-popup__data .dash-fixed-content .dash-header {
+        .dashboard__data--load-popup__data .dash-fixed-content .dash-cell,
+        .dashboard__data--load-popup__data .dash-fixed-content .dash-header {
           font-size: 1.5rem;
           padding: 5px !important;
           text-align: center !important;
