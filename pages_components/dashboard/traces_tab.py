@@ -153,9 +153,10 @@ def arguments_popup():
         id='args-trace-popup',
         size='xl',
         centered=True,
+        backdrop='static',
         children=[
             dcc.Store(id='trace_id_args'),
-            html.Form(
+            html.Div(
                 className='trace-arg',
                 children=[
                     # TABS
@@ -173,11 +174,11 @@ def arguments_popup():
                                 children=[
                                     # Name arg
                                     dmc.TextInput(
+                                        id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'name'},
                                         label='Name:',
-                                        value='hello',
                                         style={'width':200},
                                         required=True,
-                                        size='md'
+                                        size='md',
                                     ),
                                     # dataset arg
                                     html.Div(
@@ -198,7 +199,10 @@ def arguments_popup():
                                         children=[
                                             html.Label('Type:'),
                                             dcc.Dropdown(
-                                                options=[],
+                                                options=[
+                                                    {'label': chart_type, 'value': chart_type}
+                                                    for chart_type in charts_dict.keys()
+                                                ],
                                                 value=None,
                                                 className='trace-arg__dropdown',
                                                 id='trace-arg-type-dropdown',
@@ -213,32 +217,6 @@ def arguments_popup():
                                             html.Div(
                                                 className='trace-arg__container',
                                                 id='trace-arg-data-container',
-                                                # children=[
-                                                #     html.Div(
-                                                #         className='label-item-divider',
-                                                #         children=[
-                                                #             html.Label('Xaxis:'),
-                                                #             dcc.Dropdown(
-                                                #                 options=[],
-                                                #                 value=None,
-                                                #                 className='trace-arg__dropdown',
-                                                #                 id='trace-arg-xdata-dropdown',
-                                                #             )
-                                                #         ]
-                                                #     ),
-                                                #     html.Div(
-                                                #         className='label-item-divider',
-                                                #         children=[
-                                                #             html.Label('Yaxis:'),
-                                                #             dcc.Dropdown(
-                                                #                 options=[],
-                                                #                 value=None,
-                                                #                 className='trace-arg__dropdown',
-                                                #                 id='trace-arg-ydata-dropdown',
-                                                #             )
-                                                #         ]
-                                                #     ),
-                                                # ]
                                             )
                                         ]
                                     )
@@ -264,7 +242,6 @@ def arguments_popup():
                     html.Button(
                         id='apply-arg-changes',
                         className='btn__green trace-arg__submit-btn',
-                        type='Submit',
                         children='Apply'
                     )
                 ]

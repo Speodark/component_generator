@@ -1,4 +1,4 @@
-from dash import Input, Output, dcc, html, ctx, no_update, ALL, dash_table, State
+from dash import Input, Output, dcc, html, ctx, no_update, ALL, dash_table, State, MATCH
 import dash
 from dash.exceptions import PreventUpdate
 from datetime import datetime
@@ -13,10 +13,19 @@ from utilities.db import (
     get_all_traces, 
     get_newest_component, 
     delete_trace,
-    component_traces_count
+    component_traces_count,
+    get_trace,
+    get_dataset,
+    update_trace_name,
+    update_trace_active_columns,
+    update_trace_dataset,
+    update_trace
 )
 from components.charts import charts_dict
 import plotly.graph_objects as go
+from pprint import pprint
+import pandas as pd
+
 
 session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
 
@@ -190,11 +199,189 @@ def update_traces_container(
 
 @dash.callback(
     Output('args-trace-popup', 'is_open'),
-    Output('trace_id_args', 'value'),
+    Output('trace_id_args', 'data'),
+    Output({'type':'trace_arg', 'sub_type':'input', 'arg_name':ALL}, 'value'),
+    Output({'type':'trace_arg', 'sub_type':'input', 'arg_name':ALL}, 'error'),
+    Output('trace-arg-dataset-dropdown', 'options'),
+    Output('trace-arg-dataset-dropdown', 'value'),
+    Output('trace-arg-type-dropdown', 'value'),
+    Output('trace-arg-data-container', 'children'),
+    Output({'type':'trace_card','id':ALL,'sub_type':'name'},'children'),
     Input({'type':'trace_card','id':ALL,'sub_type':'edit'}, 'n_clicks'),
+    Input('close-arg-popup', 'n_clicks'),
+    Input('apply-arg-changes','n_clicks'),
+    State('trace_id_args','data'),
+    State({'type':'trace-arg', 'sub_type':'dropdown', 'section': 'data', 'arg-name':ALL} ,'value'),
+    State({'type':'trace_arg', 'sub_type':'input', 'arg_name':ALL}, 'value'),
+    State('components-dropdown','value'),
+    State('trace-arg-dataset-dropdown', 'value'),
+    State('trace-arg-type-dropdown', 'value'),
     prevent_initial_call = True
 )
 def trace_arguments_popup(
     trace_n_clicks,
+    _,
+    __,
+    # States
+    store_trace_id,
+    data_section_dd,
+    trace_inputs,
+    component_id,
+    choosen_dataset_id,
+    trace_type
 ):
-    return True, 1
+    num_sub_type_inputs = 0
+    numer_of_trace_cards = 0
+    trace_inputs_arg_name = []
+    trace_cards_ids_by_order = []
+    for output in ctx.outputs_list:
+        if isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'input':
+            num_sub_type_inputs = len(output)
+            for _output in output:
+                trace_inputs_arg_name.append(_output['id']['arg_name'])
+        elif isinstance(output,list) and output and output[0]['id'].get('type') == 'trace_card' and output[0]['id'].get('sub_type') == 'name':
+            numer_of_trace_cards = len(output)
+            for _output in output:
+                trace_cards_ids_by_order.append(_output['id']['id'])
+    popup_is_open_output = no_update # Is the popup open?
+    trace_id_args_output = no_update # The id of the trace that opened the popup
+    sub_type_inputs_output = [no_update for x in range(num_sub_type_inputs)] # The name of the trace that opened the popup
+    sub_type_inputs_error_output = [no_update for x in range(num_sub_type_inputs)] # The text for the error of the name text
+    datasets_dropdown_options_output = no_update # the list of available dataset
+    datasets_dropdown_value_output = no_update # The value of the current trace
+    traces_type_dropdown_value_output = no_update # The graph type of the current trace
+    data_container_children_output = no_update # The data requirements for the chart type
+    trace_card_name_output = [no_update for x in range(numer_of_trace_cards)] # The names of all the traces cards
+
+    triggered_id = ctx.triggered_id
+    # If the close button was clicked
+    if triggered_id == 'close-arg-popup':
+        popup_is_open_output = False
+        trace_id_args_output = None
+    # If trigger is the edit button of the trace
+    elif (
+        isinstance(triggered_id, dict) and 
+        triggered_id.get('type') and 
+        triggered_id['type'] == 'trace_card' and 
+        triggered_id['sub_type'] == 'edit'
+        ):
+        # Prevents update if the n_clicks started the function but wasn't clicked
+        # Happens when the card is created
+        for input_type in ctx.inputs_list:
+            if isinstance(input_type, list) and input_type[0]['id'].get('type') == 'trace_card' and input_type[0]['id']['sub_type'] == 'edit':
+                for index, input_ in enumerate(input_type):
+                    if input_['id'] == triggered_id:
+                        if trace_n_clicks[index] is None:
+                            raise PreventUpdate
+
+        # Outputs if clicked to open the popup
+        popup_is_open_output = True
+        trace_id_args_output = triggered_id['id']
+        trace = None
+        datasets_dropdown_options_output = []
+        with session_maker() as session:
+            trace = get_trace(trace_id_args_output, session)
+            # Datasets list
+            datasets = get_all_datasets(session)
+            datasets_dropdown_options_output = [
+                {'label': dataset.name, 'value': dataset.id}
+                for dataset in datasets
+            ]
+
+        if trace:
+            sub_type_inputs_output[trace_inputs_arg_name.index('name')] = trace.trace_name
+            datasets_dropdown_value_output = trace.dataset_id
+            traces_type_dropdown_value_output = trace.args['type'].capitalize()
+            dataset = None
+            if trace.dataset_id:
+                with session_maker() as session:
+                    dataset = pd.DataFrame(get_dataset(trace.dataset_id, session).data)
+            active_columns = trace.active_columns
+            data_container_children_output = charts_dict[traces_type_dropdown_value_output].data_arg(dataset, active_columns)
+
+
+    # If the apply button was clicked
+    elif triggered_id == 'apply-arg-changes':
+        # Get the trace
+        trace = None
+        with session_maker() as session:
+            trace = get_trace(store_trace_id, session)
+        if not trace:
+            print("In the traces callback trace_arguments_popup function somehow the trace is None")
+            raise PreventUpdate
+
+            
+        ###### Handle the data #####
+        # Get the new active columns
+        current_active_columns = trace.active_columns if trace.active_columns is not None else {}
+        active_columns = {}
+        if any(x is not None for x in data_section_dd):
+            for state_type in ctx.states_list:
+                if isinstance(state_type, list) and state_type[0]['id'].get('section') == 'data':
+                    for index, state_ in enumerate(state_type):
+                        active_columns[state_['id']['arg-name']] = state_['value']
+        # Update if the active columns changes
+        if current_active_columns != active_columns:
+            with session_maker() as session:
+                update_trace_active_columns(store_trace_id, active_columns, session)
+
+
+        ###### Handle the name #####
+        new_trace_name = trace_inputs[trace_inputs_arg_name.index('name')]
+        if new_trace_name != trace.trace_name:
+            if not new_trace_name:
+                sub_type_inputs_error_output[trace_inputs_arg_name.index('name')] = 'You must provide a name'
+            # Is the name longer than 3 characters?
+            elif len(new_trace_name) < 3:
+                sub_type_inputs_error_output[trace_inputs_arg_name.index('name')] = 'The name must be 3 characters or more'
+            else:
+                # Checks if the name already exists in the database
+                name_already_exists = False
+                with session_maker() as session:
+                    name_already_exists = trace_name_exists(component_id, new_trace_name, session)
+                if name_already_exists:
+                    sub_type_inputs_error_output[trace_inputs_arg_name.index('name')] = 'This name is already taken'
+                else:
+                    with session_maker() as session:
+                        update_trace_name(store_trace_id, new_trace_name, session)
+                    sub_type_inputs_error_output[trace_inputs_arg_name.index('name')] = None
+                    trace_card_name_output[trace_cards_ids_by_order.index(store_trace_id)] = new_trace_name
+
+
+        ###### Handle the dataset #####
+        if choosen_dataset_id != trace.dataset_id:
+            if not choosen_dataset_id:
+                data_container_children_output = []
+            else:
+                dataset = None
+                with session_maker() as session:
+                    update_trace_dataset(trace.id, choosen_dataset_id, session)
+                    update_trace_active_columns(store_trace_id, None, session)
+                    dataset = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
+                data_container_children_output = charts_dict[trace_type].data_arg(dataset, None)
+
+
+        ###### Handle the type #####
+        current_trace_type = trace.args['type'].capitalize()
+        if current_trace_type != trace_type:
+            if not trace_type:
+                data_container_children_output = []
+            else:
+                fig_json = getattr(go, trace_type)(name=trace.trace_name).to_plotly_json()
+                with session_maker() as session:
+                    update_trace(store_trace_id, fig_json, session)
+                    update_trace_active_columns(store_trace_id, None, session)
+                    dataset = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
+                data_container_children_output = charts_dict[trace_type].data_arg(dataset, None)
+
+    return (
+        popup_is_open_output,
+        trace_id_args_output,
+        sub_type_inputs_output,
+        sub_type_inputs_error_output,
+        datasets_dropdown_options_output,
+        datasets_dropdown_value_output,
+        traces_type_dropdown_value_output,
+        data_container_children_output,
+        trace_card_name_output
+    )

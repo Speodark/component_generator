@@ -14,6 +14,7 @@ class Traces(Base):
     dataset_id = Column(Integer, ForeignKey('datasets.id', ondelete='SET NULL'))
     created_at = Column(DateTime, default=datetime.utcnow)
     args = Column(JSON)
+    active_columns = Column(JSON, default=None)
     __table_args__ = (UniqueConstraint('component_id', 'trace_name', name='uix_1'),)
     component = relationship("Components", back_populates="traces")
     dataset = relationship("Datasets", back_populates="traces")
