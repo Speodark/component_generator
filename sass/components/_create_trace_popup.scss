@@ -5,7 +5,7 @@
     grid-template-rows: repeat(3, mimax(0, 1fr)) minmax(0, 1fr) max-content;
     gap: 0.8rem;
 
-    & .dash-dropdown{
+    & .dash-dropdown {
         height: 100%;
         & .Select {
             height: 100%;
@@ -71,5 +71,4 @@
         width: max-content;
         place-self: start;
     }
-
 }

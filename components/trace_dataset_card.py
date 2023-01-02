@@ -21,7 +21,7 @@ def trace_dataset_card(id:int ,name: str, card_type:str = 'dataset_card'):
                     html.Button(
                         children=html.I(className='pen-icon fa fa-pen'),
                         className='dataset-card__button',
-                        id={'type':card_type,'id':id,'sub_type':'rename'}
+                        id={'type':card_type,'id':id,'sub_type':'edit'}
                     ),
                     html.Button(
                         children=html.I(className='trash-icon fa fa-trash'),

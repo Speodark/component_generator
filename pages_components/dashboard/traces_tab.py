@@ -148,48 +148,128 @@ def delete_trace_popup():
     )
 
 
-def rename_trace_popup():
+def arguments_popup():
     return dbc.Modal(
-        id='rename-trace-popup',
-        size='lg',
+        id='args-trace-popup',
+        size='xl',
         centered=True,
-        children=html.Div(
-            className='dashboard__add-component',
-            children=[
-                dcc.Store(id='trace_id_to_rename'),
-                # The popup title
-                html.Span(
-                    className='dashboard__add-component--title',
-                    children='New Name'
-                ),
-                # The input for the component name
-                dcc.Input(
-                    id='rename-trace-input',
-                    className='dashboard__add-component--input',
-                    type="text",
-                    value='',
-                    autoComplete='off'
-                ),
-                # If while trying to create a component there's an error this will show the error
-                html.Span(
-                    id='rename-trace-warning',
-                    className='dashboard__add-component--warning hide',
-                    children=''
-                ),
-                # Create the component
-                html.Button(
-                    id='rename-trace-confirm-btn',
-                    className='btn__green dashboard__add-component--create-btn',
-                    children='Rename'
-                ),
-                # Cancel the component creation
-                html.Button(
-                    id='rename-trace-cancel-btn',
-                    className='btn__red dashboard__add-component--cancel-btn',
-                    children='Cancel'
-                )
-            ]
-        )
+        children=[
+            dcc.Store(id='trace_id_args'),
+            html.Form(
+                className='trace-arg',
+                children=[
+                    # TABS
+                    dmc.Tabs(
+                        children=[
+                            dmc.TabsList(
+                                [
+                                    dmc.Tab('Info', value='Info'),
+                                    dmc.Tab('Style', value='Style'),
+                                    dmc.Tab('Xaxis', value='Xaxis'),
+                                ],
+                                grow=True
+                            ),
+                            dmc.TabsPanel(
+                                children=[
+                                    # Name arg
+                                    dmc.TextInput(
+                                        label='Name:',
+                                        value='hello',
+                                        style={'width':200},
+                                        required=True,
+                                        size='md'
+                                    ),
+                                    # dataset arg
+                                    html.Div(
+                                        className='label-item-divider',
+                                        children=[
+                                            html.Label('Datasets:'),
+                                            dcc.Dropdown(
+                                                options=[],
+                                                value=None,
+                                                className='trace-arg__dropdown',
+                                                id='trace-arg-dataset-dropdown',
+                                            )
+                                        ]
+                                    ),
+                                    # type arg
+                                    html.Div(
+                                        className='label-item-divider',
+                                        children=[
+                                            html.Label('Type:'),
+                                            dcc.Dropdown(
+                                                options=[],
+                                                value=None,
+                                                className='trace-arg__dropdown',
+                                                id='trace-arg-type-dropdown',
+                                            )
+                                        ]
+                                    ),
+                                    # Data arg
+                                    html.Div(
+                                        className='label-item-divider',
+                                        children=[
+                                            html.Label('Data:'),
+                                            html.Div(
+                                                className='trace-arg__container',
+                                                id='trace-arg-data-container',
+                                                # children=[
+                                                #     html.Div(
+                                                #         className='label-item-divider',
+                                                #         children=[
+                                                #             html.Label('Xaxis:'),
+                                                #             dcc.Dropdown(
+                                                #                 options=[],
+                                                #                 value=None,
+                                                #                 className='trace-arg__dropdown',
+                                                #                 id='trace-arg-xdata-dropdown',
+                                                #             )
+                                                #         ]
+                                                #     ),
+                                                #     html.Div(
+                                                #         className='label-item-divider',
+                                                #         children=[
+                                                #             html.Label('Yaxis:'),
+                                                #             dcc.Dropdown(
+                                                #                 options=[],
+                                                #                 value=None,
+                                                #                 className='trace-arg__dropdown',
+                                                #                 id='trace-arg-ydata-dropdown',
+                                                #             )
+                                                #         ]
+                                                #     ),
+                                                # ]
+                                            )
+                                        ]
+                                    )
+                                ], 
+                                value='Info',
+                                className='trace-arg__info-tab'
+                            ),
+                            dmc.TabsPanel(html.Div(), value='Style'),
+                            dmc.TabsPanel(html.Div(), value='Xaxis'),
+                        ],
+                        orientation='vertical',
+                        placement='left',
+                        value='Info',
+                        className='trace-arg__tabs'
+                    ),
+                    # Cancel Button
+                    html.Button(
+                        id = 'close-arg-popup',
+                        className='trace-arg__close-btn',
+                        children='X'
+                    ),
+                    # Submit Button
+                    html.Button(
+                        id='apply-arg-changes',
+                        className='btn__green trace-arg__submit-btn',
+                        type='Submit',
+                        children='Apply'
+                    )
+                ]
+            )
+        ]
     )
 
 
@@ -218,7 +298,6 @@ def dashboard_traces_tab(session_maker):
             create_trace_popup(session_maker),
             dcc.Store(id='deleted_trace_trigger'),
             delete_trace_popup(),
-            dcc.Store(id='rename_trace_trigger'),
-            rename_trace_popup()
+            arguments_popup()
         ]
     )

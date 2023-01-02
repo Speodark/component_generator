@@ -279,6 +279,56 @@ body {
     width: max-content;
     place-self: start; }
 
+.trace-arg {
+  position: relative;
+  height: 60vh;
+  font-size: 1.5rem; }
+  .trace-arg label {
+    font-weight: bold;
+    line-height: 1.55; }
+  .trace-arg__close-btn {
+    color: white;
+    background-color: red;
+    border: none;
+    font-size: 16px;
+    padding: 0.5rem;
+    position: absolute;
+    top: 8px;
+    right: 8px; }
+    .trace-arg__close-btn:hover {
+      background-color: darkred; }
+  .trace-arg__submit-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px; }
+  .trace-arg__tabs {
+    width: 100%;
+    height: 100%; }
+  .trace-arg__info-tab {
+    padding: 2rem;
+    overflow-y: auto; }
+    .trace-arg__info-tab > * {
+      padding-bottom: 0.8rem; }
+  .trace-arg .mantine-1js7218 {
+    font-size: 1.5rem; }
+  .trace-arg .mantine-1qcpoqw {
+    font-size: 1.5rem; }
+  .trace-arg .dash-dropdown {
+    height: 100%; }
+    .trace-arg .dash-dropdown .Select {
+      height: 100%; }
+      .trace-arg .dash-dropdown .Select .Select-control {
+        height: 100%; }
+  .trace-arg__dropdown {
+    width: 19rem; }
+    .trace-arg__dropdown .Select-value {
+      display: flex;
+      align-items: center; }
+  .trace-arg__container {
+    padding: 1.5rem;
+    padding-left: 2rem;
+    border: 1.5px solid blue; }
+
 .dashboard {
   height: 100%;
   width: 100%;

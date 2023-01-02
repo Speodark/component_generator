@@ -334,7 +334,7 @@ def delete_dataset_popup(
     # Number of datasets left
     Output('rename_dataset_trigger', 'data'),
     # INPUTS
-    Input({'type':'dataset_card','id':ALL,'sub_type':'rename'}, 'n_clicks'),
+    Input({'type':'dataset_card','id':ALL,'sub_type':'edit'}, 'n_clicks'),
     Input('rename-dataset-confirm-btn', 'n_clicks'),
     Input('rename-dataset-cancel-btn', 'n_clicks'),
     # STATES

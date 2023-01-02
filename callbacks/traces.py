@@ -170,7 +170,8 @@ def delete_dataset_popup(
     Output('traces-container', 'children'),
     Input('components-dropdown', 'value'),
     Input('added-trace-trigger','data'),
-    Input('deleted_trace_trigger', 'data')
+    Input('deleted_trace_trigger', 'data'),
+    prevent_initial_call = True
 )
 def update_traces_container(
     component_id,
@@ -185,3 +186,15 @@ def update_traces_container(
             traces_cards = [trace_dataset_card(trace.id, trace.trace_name, 'trace_card') for trace in get_all_traces(component_id, session)]
     
     return traces_cards
+
+
+@dash.callback(
+    Output('args-trace-popup', 'is_open'),
+    Output('trace_id_args', 'value'),
+    Input({'type':'trace_card','id':ALL,'sub_type':'edit'}, 'n_clicks'),
+    prevent_initial_call = True
+)
+def trace_arguments_popup(
+    trace_n_clicks,
+):
+    return True, 1
