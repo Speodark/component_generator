@@ -156,6 +156,7 @@ def arguments_popup():
         backdrop='static',
         children=[
             dcc.Store(id='trace_id_args'),
+            dcc.Store(id='updated_trace_trigger'),
             html.Div(
                 className='trace-arg',
                 children=[

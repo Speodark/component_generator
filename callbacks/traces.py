@@ -207,6 +207,7 @@ def update_traces_container(
     Output('trace-arg-type-dropdown', 'value'),
     Output('trace-arg-data-container', 'children'),
     Output({'type':'trace_card','id':ALL,'sub_type':'name'},'children'),
+    Output('updated_trace_trigger', 'data'),
     Input({'type':'trace_card','id':ALL,'sub_type':'edit'}, 'n_clicks'),
     Input('close-arg-popup', 'n_clicks'),
     Input('apply-arg-changes','n_clicks'),
@@ -252,6 +253,7 @@ def trace_arguments_popup(
     traces_type_dropdown_value_output = no_update # The graph type of the current trace
     data_container_children_output = no_update # The data requirements for the chart type
     trace_card_name_output = [no_update for x in range(numer_of_trace_cards)] # The names of all the traces cards
+    updated_trace_trigger_output = no_update
 
     triggered_id = ctx.triggered_id
     # If the close button was clicked
@@ -322,8 +324,12 @@ def trace_arguments_popup(
                         active_columns[state_['id']['arg-name']] = state_['value']
         # Update if the active columns changes
         if current_active_columns != active_columns:
+            
+            fig_json = getattr(go, trace_type)(name=trace.trace_name, **active_columns).to_plotly_json()
             with session_maker() as session:
+                update_trace(store_trace_id, fig_json, session)
                 update_trace_active_columns(store_trace_id, active_columns, session)
+            updated_trace_trigger_output = datetime.now()
 
 
         ###### Handle the name #####
@@ -354,11 +360,14 @@ def trace_arguments_popup(
                 data_container_children_output = []
             else:
                 dataset = None
+                fig_json = getattr(go, trace_type)(name=trace.trace_name).to_plotly_json()
                 with session_maker() as session:
+                    update_trace(store_trace_id, fig_json, session)
                     update_trace_dataset(trace.id, choosen_dataset_id, session)
                     update_trace_active_columns(store_trace_id, None, session)
                     dataset = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
                 data_container_children_output = charts_dict[trace_type].data_arg(dataset, None)
+                updated_trace_trigger_output = datetime.now()
 
 
         ###### Handle the type #####
@@ -373,6 +382,7 @@ def trace_arguments_popup(
                     update_trace_active_columns(store_trace_id, None, session)
                     dataset = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
                 data_container_children_output = charts_dict[trace_type].data_arg(dataset, None)
+                updated_trace_trigger_output = datetime.now()
 
     return (
         popup_is_open_output,
@@ -383,5 +393,6 @@ def trace_arguments_popup(
         datasets_dropdown_value_output,
         traces_type_dropdown_value_output,
         data_container_children_output,
-        trace_card_name_output
+        trace_card_name_output,
+        updated_trace_trigger_output
     )
