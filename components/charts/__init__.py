@@ -15,7 +15,8 @@ charts_dict = {}
 files = glob.glob(os.path.join(current_dir, '*.py'))
 ready_files = [
     'bar',
-    'box'
+    'box',
+    'scatter'
 ]
 # Loop through the files and import everything from each file
 for file in files:

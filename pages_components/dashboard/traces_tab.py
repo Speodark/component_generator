@@ -3,7 +3,9 @@ import dash_bootstrap_components as dbc
 from dash import html, dcc
 from utilities.db import get_all_datasets, traces_count, get_all_traces, get_newest_component
 from components.charts import charts_dict
-from components import trace_dataset_card
+from components import trace_dataset_card, Args
+
+args_builder = Args()
 
 def create_trace_popup(session_maker):
     datasets_name_id = []
@@ -225,7 +227,13 @@ def arguments_popup():
                                 value='Info',
                                 className='trace-arg__info-tab'
                             ),
-                            dmc.TabsPanel(html.Div(), value='Style'),
+                            dmc.TabsPanel(
+                                children=[
+                                    args_builder.visible()
+                                ], 
+                                value='Style',
+                                className='trace-arg__info-tab'
+                            ),
                             dmc.TabsPanel(html.Div(), value='Xaxis'),
                         ],
                         orientation='vertical',

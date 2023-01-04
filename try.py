@@ -1,6 +1,5 @@
 class Parent:
     def func1(self):
-        print('I am func1 from the parent')
         self.func2()
     
     def func2(self):

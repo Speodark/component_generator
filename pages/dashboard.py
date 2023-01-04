@@ -4,13 +4,14 @@ import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.graph_objects as go
-from callbacks.callbacks import *
+from callbacks import *
 from components import *
 from app import TITLE
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from utilities.db import components_count, get_all_components, get_all_traces, get_newest_component
 from pages_components.dashboard import *
+import dash
 
 dash.register_page(
     __name__,

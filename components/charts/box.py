@@ -6,7 +6,6 @@ class Box:
     # DONT HAVE legendonly
     args_list = [
         'name',
-        'visible'
     ]
 
     @staticmethod
@@ -26,7 +25,7 @@ class Box:
                         options=options,
                         value=yaxis_value,
                         className='trace-arg__dropdown',
-                        id={'type':'trace-arg', 'sub_type':'dropdown', 'section': 'data', 'arg-name':'y'},
+                        id={'type':'trace_arg', 'sub_type':'dropdown', 'section': 'data', 'arg_name':'y'},
                     )
                 ]
             ),

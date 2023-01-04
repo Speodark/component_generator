@@ -29,11 +29,6 @@ import pandas as pd
 
 session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
 
-chart_type_to_class = {
-    'line_chart': line_chart,
-    'bar_chart': bar_chart
-}
-
 
 @dash.callback(
     Output('create-trace-popup', 'is_open'),
@@ -208,15 +203,17 @@ def update_traces_container(
     Output('trace-arg-data-container', 'children'),
     Output({'type':'trace_card','id':ALL,'sub_type':'name'},'children'),
     Output('updated_trace_trigger', 'data'),
+    Output({'type':'trace_arg', 'sub_type':'divider', 'arg_name':ALL}, 'className'),
     Input({'type':'trace_card','id':ALL,'sub_type':'edit'}, 'n_clicks'),
     Input('close-arg-popup', 'n_clicks'),
     Input('apply-arg-changes','n_clicks'),
     Input('trace-arg-dataset-dropdown', 'value'),
     Input('trace-arg-type-dropdown', 'value'),
     State('trace_id_args','data'),
-    State({'type':'trace-arg', 'sub_type':'dropdown', 'section': 'data', 'arg-name':ALL} ,'value'),
+    State({'type':'trace_arg', 'sub_type':'dropdown', 'section': 'data', 'arg_name':ALL} ,'value'),
     State({'type':'trace_arg', 'sub_type':'input', 'arg_name':ALL}, 'value'),
     State('components-dropdown','value'),
+    State({'type':'trace_arg', 'sub_type':'divider', 'arg_name':ALL}, 'className'),
     prevent_initial_call = True
 )
 def trace_arguments_popup(
@@ -230,6 +227,7 @@ def trace_arguments_popup(
     data_section_dd,
     trace_inputs,
     component_id,
+    trace_args_classnames
 ):
     num_sub_type_inputs = 0
     numer_of_trace_cards = 0
@@ -254,6 +252,7 @@ def trace_arguments_popup(
     data_container_children_output = no_update # The data requirements for the chart type
     trace_card_name_output = [no_update for x in range(numer_of_trace_cards)] # The names of all the traces cards
     updated_trace_trigger_output = no_update
+    trace_args_classnames_output = no_update
 
     triggered_id = ctx.triggered_id
     # If the close button was clicked
@@ -270,7 +269,7 @@ def trace_arguments_popup(
         # Prevents update if the n_clicks started the function but wasn't clicked
         # Happens when the card is created
         for input_type in ctx.inputs_list:
-            if isinstance(input_type, list) and input_type[0]['id'].get('type') == 'trace_card' and input_type[0]['id']['sub_type'] == 'edit':
+            if isinstance(input_type, list) and input_type and input_type[0]['id'].get('type') == 'trace_card' and input_type[0]['id']['sub_type'] == 'edit':
                 for index, input_ in enumerate(input_type):
                     if input_['id'] == triggered_id:
                         if trace_n_clicks[index] is None:
@@ -301,7 +300,18 @@ def trace_arguments_popup(
             active_columns = trace.active_columns
             data_container_children_output = charts_dict[traces_type_dropdown_value_output].data_arg(dataset, active_columns)
 
-
+            # Which arguments to show
+            for state_type in ctx.states_list:
+                if isinstance(state_type, list):
+                    print(state_type)
+                if isinstance(state_type, list) and state_type and state_type[0]['id'].get('sub_type') == 'divider':
+                    for index, state_ in enumerate(state_type):
+                        if state_['id']['arg_name'] in charts_dict[trace.args['type'].capitalize()].args_list:
+                            trace_args_classnames[index] = trace_args_classnames[index].replace('hide', '')
+                        else:
+                            trace_args_classnames[index] = trace_args_classnames[index] if 'hide' in trace_args_classnames[index] \
+                                                           else trace_args_classnames[index] + ' hide'
+            trace_args_classnames_output = trace_args_classnames
     # If the apply button was clicked
     elif triggered_id in ['apply-arg-changes','trace-arg-dataset-dropdown','trace-arg-type-dropdown']:
         # Get the trace
@@ -334,9 +344,9 @@ def trace_arguments_popup(
             active_columns = {}
             if any(x is not None for x in data_section_dd):
                 for state_type in ctx.states_list:
-                    if isinstance(state_type, list) and state_type[0]['id'].get('section') == 'data':
+                    if isinstance(state_type, list) and state_type and state_type[0]['id'].get('section') == 'data':
                         for index, state_ in enumerate(state_type):
-                            active_columns[state_['id']['arg-name']] = state_['value']
+                            active_columns[state_['id']['arg_name']] = state_['value']
             # Update if the active columns changes
             if current_active_columns != active_columns:
                 with session_maker() as session:
@@ -399,5 +409,6 @@ def trace_arguments_popup(
         traces_type_dropdown_value_output,
         data_container_children_output,
         trace_card_name_output,
-        updated_trace_trigger_output
+        updated_trace_trigger_output,
+        trace_args_classnames_output
     )

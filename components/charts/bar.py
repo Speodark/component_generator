@@ -28,7 +28,7 @@ class Bar:
                         options=options,
                         value=xaxis_value,
                         className='trace-arg__dropdown',
-                        id={'type':'trace-arg', 'sub_type':'dropdown', 'section': 'data', 'arg-name':'x'},
+                        id={'type':'trace_arg', 'sub_type':'dropdown', 'section': 'data', 'arg_name':'x'},
                     )
                 ]
             ),
@@ -40,7 +40,7 @@ class Bar:
                         options=options,
                         value=yaxis_value,
                         className='trace-arg__dropdown',
-                        id={'type':'trace-arg', 'sub_type':'dropdown', 'section': 'data', 'arg-name':'y'},
+                        id={'type':'trace_arg', 'sub_type':'dropdown', 'section': 'data', 'arg_name':'y'},
                     )
                 ]
             ),
