@@ -211,25 +211,25 @@ def update_traces_container(
     Input({'type':'trace_card','id':ALL,'sub_type':'edit'}, 'n_clicks'),
     Input('close-arg-popup', 'n_clicks'),
     Input('apply-arg-changes','n_clicks'),
+    Input('trace-arg-dataset-dropdown', 'value'),
+    Input('trace-arg-type-dropdown', 'value'),
     State('trace_id_args','data'),
     State({'type':'trace-arg', 'sub_type':'dropdown', 'section': 'data', 'arg-name':ALL} ,'value'),
     State({'type':'trace_arg', 'sub_type':'input', 'arg_name':ALL}, 'value'),
     State('components-dropdown','value'),
-    State('trace-arg-dataset-dropdown', 'value'),
-    State('trace-arg-type-dropdown', 'value'),
     prevent_initial_call = True
 )
 def trace_arguments_popup(
     trace_n_clicks,
     _,
     __,
+    choosen_dataset_id,
+    trace_type,
     # States
     store_trace_id,
     data_section_dd,
     trace_inputs,
     component_id,
-    choosen_dataset_id,
-    trace_type
 ):
     num_sub_type_inputs = 0
     numer_of_trace_cards = 0
@@ -303,7 +303,7 @@ def trace_arguments_popup(
 
 
     # If the apply button was clicked
-    elif triggered_id == 'apply-arg-changes':
+    elif triggered_id in ['apply-arg-changes','trace-arg-dataset-dropdown','trace-arg-type-dropdown']:
         # Get the trace
         trace = None
         with session_maker() as session:
@@ -312,24 +312,46 @@ def trace_arguments_popup(
             print("In the traces callback trace_arguments_popup function somehow the trace is None")
             raise PreventUpdate
 
+        ###### Handle the dataset #####
+        if choosen_dataset_id != trace.dataset_id:
+            if not choosen_dataset_id:
+                data_container_children_output = []
+            else:
+                dataset = None
+                fig_json = getattr(go, trace_type)(name=trace.trace_name).to_plotly_json()
+                with session_maker() as session:
+                    update_trace(store_trace_id, fig_json, session)
+                    update_trace_dataset(trace.id, choosen_dataset_id, session)
+                    update_trace_active_columns(store_trace_id, None, session)
+                    dataset = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
+                data_container_children_output = charts_dict[trace_type].data_arg(dataset, None)
+                updated_trace_trigger_output = datetime.now()
             
         ###### Handle the data #####
         # Get the new active columns
-        current_active_columns = trace.active_columns if trace.active_columns is not None else {}
-        active_columns = {}
-        if any(x is not None for x in data_section_dd):
-            for state_type in ctx.states_list:
-                if isinstance(state_type, list) and state_type[0]['id'].get('section') == 'data':
-                    for index, state_ in enumerate(state_type):
-                        active_columns[state_['id']['arg-name']] = state_['value']
-        # Update if the active columns changes
-        if current_active_columns != active_columns:
-            
-            fig_json = getattr(go, trace_type)(name=trace.trace_name, **active_columns).to_plotly_json()
-            with session_maker() as session:
-                update_trace(store_trace_id, fig_json, session)
-                update_trace_active_columns(store_trace_id, active_columns, session)
-            updated_trace_trigger_output = datetime.now()
+        if choosen_dataset_id:
+            current_active_columns = trace.active_columns if trace.active_columns is not None else {}
+            active_columns = {}
+            if any(x is not None for x in data_section_dd):
+                for state_type in ctx.states_list:
+                    if isinstance(state_type, list) and state_type[0]['id'].get('section') == 'data':
+                        for index, state_ in enumerate(state_type):
+                            active_columns[state_['id']['arg-name']] = state_['value']
+            # Update if the active columns changes
+            if current_active_columns != active_columns:
+                with session_maker() as session:
+                    if None not in data_section_dd:
+                        df = pd.DataFrame(get_dataset(trace.dataset_id, session).data)
+                        fig_data = {
+                            arg_name : df[column_name].tolist()
+                            for arg_name, column_name in active_columns.items()
+                        }
+                        fig_json = getattr(go, trace_type)(name=trace.trace_name, **fig_data).to_plotly_json()
+                    else:
+                        fig_json = getattr(go, trace_type)(name=trace.trace_name).to_plotly_json()
+                    update_trace(store_trace_id, fig_json, session)
+                    update_trace_active_columns(store_trace_id, active_columns, session)
+                updated_trace_trigger_output = datetime.now()
 
 
         ###### Handle the name #####
@@ -354,22 +376,6 @@ def trace_arguments_popup(
                     trace_card_name_output[trace_cards_ids_by_order.index(store_trace_id)] = new_trace_name
 
 
-        ###### Handle the dataset #####
-        if choosen_dataset_id != trace.dataset_id:
-            if not choosen_dataset_id:
-                data_container_children_output = []
-            else:
-                dataset = None
-                fig_json = getattr(go, trace_type)(name=trace.trace_name).to_plotly_json()
-                with session_maker() as session:
-                    update_trace(store_trace_id, fig_json, session)
-                    update_trace_dataset(trace.id, choosen_dataset_id, session)
-                    update_trace_active_columns(store_trace_id, None, session)
-                    dataset = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
-                data_container_children_output = charts_dict[trace_type].data_arg(dataset, None)
-                updated_trace_trigger_output = datetime.now()
-
-
         ###### Handle the type #####
         current_trace_type = trace.args['type'].capitalize()
         if current_trace_type != trace_type:
@@ -383,7 +389,6 @@ def trace_arguments_popup(
                     dataset = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
                 data_container_children_output = charts_dict[trace_type].data_arg(dataset, None)
                 updated_trace_trigger_output = datetime.now()
-
     return (
         popup_is_open_output,
         trace_id_args_output,

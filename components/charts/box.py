@@ -3,6 +3,11 @@ from dash import html, dcc
 import pandas as pd
 
 class Box:
+    # DONT HAVE legendonly
+    args_list = [
+        'name',
+        'visible'
+    ]
 
     @staticmethod
     def data_arg(dataset, active_columns):

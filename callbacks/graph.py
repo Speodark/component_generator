@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from utilities.db import get_all_traces, get_newest_component
 import plotly.graph_objects as go
+from datetime import datetime
 
 session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
 
@@ -12,11 +13,13 @@ session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.d
     Input('components-dropdown', 'value'),
     Input('added-trace-trigger','data'),
     Input('deleted_trace_trigger', 'data'),
+    Input('updated_trace_trigger', 'data'),
 )
 def update_figure(
     component_id,
     _,
-    __
+    __,
+    ___
 ):
     traces = []
     with session_maker() as session:

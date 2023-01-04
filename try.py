@@ -1,15 +1,17 @@
-import plotly.graph_objects as go
-import json
+class Parent:
+    def func1(self):
+        print('I am func1 from the parent')
+        self.func2()
+    
+    def func2(self):
+        print('I am func2 from the parent')
 
-# Data for the bar chart
-x = ['apples', 'oranges', 'bananas']
-y = [3, 4, 2]
+class Child(Parent):
+    def func2(self):
+        print('I am func2 from the child')
 
-# Create the bar chart
-json_data = go.Bar(x=x, y=y).to_plotly_json()
+# Create an instance of the Child class
+child = Child()
 
-print(json_data)
-
-fig = go.Figure([json_data,json_data])
-print(fig)
-fig.show()
+# Call the func1 function on the Child instance
+child.func1()

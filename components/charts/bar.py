@@ -3,8 +3,10 @@ from dash import html, dcc
 import pandas as pd
 
 class Bar:
+    # DONT HAVE LEGEND ONLY
     args_list = [
-        'name'
+        'name',
+        'visible'
     ]
     
     @staticmethod
