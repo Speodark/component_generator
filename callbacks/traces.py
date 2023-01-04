@@ -231,6 +231,7 @@ def trace_arguments_popup(
 ):
     num_sub_type_inputs = 0
     numer_of_trace_cards = 0
+    num_of_args = 0
     trace_inputs_arg_name = []
     trace_cards_ids_by_order = []
     for output in ctx.outputs_list:
@@ -242,6 +243,8 @@ def trace_arguments_popup(
             numer_of_trace_cards = len(output)
             for _output in output:
                 trace_cards_ids_by_order.append(_output['id']['id'])
+        elif isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'divider':
+            num_of_args = len(output)
     popup_is_open_output = no_update # Is the popup open?
     trace_id_args_output = no_update # The id of the trace that opened the popup
     sub_type_inputs_output = [no_update for x in range(num_sub_type_inputs)] # The name of the trace that opened the popup
@@ -252,7 +255,7 @@ def trace_arguments_popup(
     data_container_children_output = no_update # The data requirements for the chart type
     trace_card_name_output = [no_update for x in range(numer_of_trace_cards)] # The names of all the traces cards
     updated_trace_trigger_output = no_update
-    trace_args_classnames_output = no_update
+    trace_args_classnames_output = [no_update for x in range(num_of_args)]
 
     triggered_id = ctx.triggered_id
     # If the close button was clicked
@@ -302,12 +305,13 @@ def trace_arguments_popup(
 
             # Which arguments to show
             for state_type in ctx.states_list:
-                if isinstance(state_type, list):
-                    print(state_type)
                 if isinstance(state_type, list) and state_type and state_type[0]['id'].get('sub_type') == 'divider':
                     for index, state_ in enumerate(state_type):
                         if state_['id']['arg_name'] in charts_dict[trace.args['type'].capitalize()].args_list:
+                            print("HERE")
+                            print(charts_dict[trace.args['type'].capitalize()].args_list)
                             trace_args_classnames[index] = trace_args_classnames[index].replace('hide', '')
+                            print(trace_args_classnames)
                         else:
                             trace_args_classnames[index] = trace_args_classnames[index] if 'hide' in trace_args_classnames[index] \
                                                            else trace_args_classnames[index] + ' hide'
