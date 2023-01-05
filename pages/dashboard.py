@@ -45,8 +45,9 @@ def dashboard_args():
 def generate_figure():
     traces = []
     with session_maker() as session:
-        component_id = get_newest_component(session).id
-        traces = [trace.args for trace in get_all_traces(component_id, session)]
+        component = get_newest_component(session)
+        if component is not None:
+            traces = [trace.args for trace in get_all_traces(component.id, session)]
     return go.Figure(
         data=traces
     )
