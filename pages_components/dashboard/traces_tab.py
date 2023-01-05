@@ -6,7 +6,6 @@ from components.charts import charts_dict
 from components import trace_dataset_card, Args
 
 args_builder = Args()
-
 def create_trace_popup(session_maker):
     datasets_name_id = []
     with session_maker() as session:
@@ -227,6 +226,7 @@ def arguments_popup():
                                 value='Info',
                                 className='trace-arg__info-tab'
                             ),
+                            # INFO
                             dmc.TabsPanel(
                                 children=[
                                     args_builder.visible()
