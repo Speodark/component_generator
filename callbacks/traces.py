@@ -205,6 +205,7 @@ def update_traces_container(
     Output({'type':'trace_card','id':ALL,'sub_type':'name'},'children'),
     Output('updated_trace_trigger', 'data'),
     Output({'type':'trace_arg', 'sub_type':'divider', 'arg_name':ALL}, 'className'),
+    Output({'type':'trace_arg', 'sub_type':'dropdown', 'arg_name':ALL}, 'value'),
     Input({'type':'trace_card','id':ALL,'sub_type':'edit'}, 'n_clicks'),
     Input('close-arg-popup', 'n_clicks'),
     Input('apply-arg-changes','n_clicks'),
@@ -233,21 +234,31 @@ def trace_arguments_popup(
     trace_args_classnames
 ):
     num_sub_type_inputs = 0
+    num_sub_type_dropdowns = 0
     numer_of_trace_cards = 0
     num_of_args = 0
     trace_inputs_arg_name = []
+    trace_dropdowns_arg_name = []
     trace_cards_ids_by_order = []
+
+    
     for output in ctx.outputs_list:
         if isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'input':
             num_sub_type_inputs = len(output)
             for _output in output:
                 trace_inputs_arg_name.append(_output['id']['arg_name'])
+        elif isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'dropdown':
+            num_sub_type_dropdowns = len(output)
+            for _output in output:
+                trace_dropdowns_arg_name.append(_output['id']['arg_name'])
         elif isinstance(output,list) and output and output[0]['id'].get('type') == 'trace_card' and output[0]['id'].get('sub_type') == 'name':
             numer_of_trace_cards = len(output)
             for _output in output:
                 trace_cards_ids_by_order.append(_output['id']['id'])
         elif isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'divider':
             num_of_args = len(output)
+
+
     popup_is_open_output = no_update # Is the popup open?
     trace_id_args_output = no_update # The id of the trace that opened the popup
     sub_type_inputs_output = [no_update for x in range(num_sub_type_inputs)] # The name of the trace that opened the popup
@@ -259,6 +270,7 @@ def trace_arguments_popup(
     trace_card_name_output = [no_update for x in range(numer_of_trace_cards)] # The names of all the traces cards
     updated_trace_trigger_output = no_update
     trace_args_classnames_output = [no_update for x in range(num_of_args)]
+    sub_type_dropdowns_output = [no_update for x in range(num_sub_type_dropdowns)] # The dropdowns values
 
     triggered_id = ctx.triggered_id
     # If the close button was clicked
@@ -272,7 +284,30 @@ def trace_arguments_popup(
         triggered_id['type'] == 'trace_card' and 
         triggered_id['sub_type'] == 'edit'
         ):
-        pass
+        # Always changes without the need to check anything else
+        trace_id_args_output = triggered_id['id']
+        popup_is_open_output = True
+        # Changes depends on other stuff
+        ( 
+            datasets_dropdown_options_output,
+            datasets_dropdown_value_output,
+            data_container_children_output,
+            trace_args_classnames_output
+        ) = edit_button_click(
+            # Regular args
+            trace_n_clicks,
+            session_maker,
+            sub_type_inputs_output,
+            sub_type_dropdowns_output,
+            trace_inputs_arg_name,
+            trace_args_classnames,
+            # Output args
+            trace_id_args_output,
+            datasets_dropdown_options_output,
+            datasets_dropdown_value_output,
+            data_container_children_output,
+            trace_args_classnames_output
+        )
 
 
     # If the dataset dropdown triggered
@@ -374,7 +409,6 @@ def trace_arguments_popup(
                     dataset = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
                 data_container_children_output = charts_dict[trace_type].data_arg(dataset, None)
                 updated_trace_trigger_output = datetime.now()
-    print(data_container_children_output)
     return (
         popup_is_open_output,
         trace_id_args_output,
@@ -386,5 +420,6 @@ def trace_arguments_popup(
         data_container_children_output,
         trace_card_name_output,
         updated_trace_trigger_output,
-        trace_args_classnames_output
+        trace_args_classnames_output,
+        sub_type_dropdowns_output
     )
