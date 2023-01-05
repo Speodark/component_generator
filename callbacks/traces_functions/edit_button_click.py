@@ -94,7 +94,8 @@ def edit_button_click(
         datasets_dropdown_options_output,
         datasets_dropdown_value_output,
         data_container_children_output,
-        trace_args_classnames_output
+        trace_args_classnames_output,
+        traces_type_dropdown_value_output
     )
     
 

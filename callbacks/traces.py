@@ -292,7 +292,8 @@ def trace_arguments_popup(
             datasets_dropdown_options_output,
             datasets_dropdown_value_output,
             data_container_children_output,
-            trace_args_classnames_output
+            trace_args_classnames_output,
+            traces_type_dropdown_value_output
         ) = edit_button_click(
             # Regular args
             trace_n_clicks,
@@ -312,22 +313,10 @@ def trace_arguments_popup(
 
     # If the dataset dropdown triggered
     elif triggered_id in 'trace-arg-dataset-dropdown':
-        print("HERE")
-        # Get the trace
-        trace = get_trace_object(session_maker, store_trace_id)
-        if choosen_dataset_id != trace.dataset_id:
-            print("NOT EQUAL")
-            if not choosen_dataset_id:
-                print("ITS NULL")
-                data_container_children_output = []
-            else:
-                print("ITS NOT NULL")
-                dataset = None
-                with session_maker() as session:
-                    dataset = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
-                if dataset is not None:
-                    print("DATASET IS NOT NONE")
-                data_container_children_output = charts_dict[trace_type].data_arg(dataset, None)
+        dataset = None
+        with session_maker() as session:
+            dataset = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
+        data_container_children_output = charts_dict[trace_type].data_arg(dataset, None)
 
     ################################## BUILD ARGS AND FIG
     # new_fig_args = new_figure_args(trace, trace_dropdowns, trace_inputs)
