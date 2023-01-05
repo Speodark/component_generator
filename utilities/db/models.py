@@ -34,7 +34,8 @@ class Datasets(Base):
     data = Column(JSON)
     traces = relationship("Traces", back_populates="dataset")
 
-@event.listens_for(Traces.__table__, 'after_update')
+
+@event.listens_for(Traces, 'after_update')
 def set_active_columns_to_null(mapper, connection, target):
     if target.dataset_id is None:
         connection.execute(
