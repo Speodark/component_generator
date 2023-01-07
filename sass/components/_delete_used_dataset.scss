@@ -1,0 +1,33 @@
+.delete-used-dataset {
+    display: grid;
+    grid-template-rows: repeat(5, max-content);
+    padding: 1.5rem;
+    gap: 1rem;
+
+    &--title {
+        font-size: 1.8em;
+        // grid-row: 1/2;
+        text-align: center;
+    }
+
+    &--warning {
+        // grid-row: 2/3;
+        font-size: 2em;
+        color: red;
+        text-align: center;
+    }
+
+    &--delete {
+        grid-row: -2/-1;
+        grid-column: 1/2;
+        width: max-content;
+        place-self: end;
+    }
+
+    &--cancel {
+        grid-row: -2/-1;
+        grid-column: 1/2;
+        width: max-content;
+        place-self: start;
+    }
+}

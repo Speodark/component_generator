@@ -9,7 +9,16 @@ from datetime import datetime
 from pprint import pprint
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from utilities.db import dataset_name_exists, add_dataset, datasets_count, get_all_datasets, delete_dataset, rename_dataset, get_dataset
+from utilities.db import (
+    dataset_name_exists, 
+    add_dataset, 
+    datasets_count, 
+    get_all_datasets, 
+    delete_dataset, 
+    rename_dataset, 
+    get_dataset, 
+    dataset_is_connected_to_traces
+)
 from components import trace_dataset_card
 session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
 
@@ -281,9 +290,12 @@ def open_add_dataset_popup(
     Output('delete-dataset-popup', 'is_open'),
     Output('dataset_id_to_delete', 'value'),
     Output('deleted_dataset_trigger', 'data'),
+    Output('used-delete-dataset-popup', 'is_open'),
     Input({'type':'dataset_card','id':ALL,'sub_type':'delete'}, 'n_clicks'),
     Input('cancel-dataset-delete-btn', 'n_clicks'),
     Input('delete-dataset-btn','n_clicks'),
+    Input('used-cancel-dataset-delete-btn', 'n_clicks'),
+    Input('used-delete-dataset-btn', 'n_clicks'),
     State('dataset_id_to_delete', 'value'),
     prevent_initial_call = True
 )
@@ -291,15 +303,20 @@ def delete_dataset_popup(
     n_clicks_dataset_cards,
     __,
     ___,
+    _,
+    ____,
     dataset_id_to_delete
 ):
-    is_popup_open = no_update
+    delete_dataset_popup_output = no_update
     dataset_id_to_delete_output = no_update
     deleted_dataset_trigger = no_update # Triggers the build of the cards container
+    used_delete_dataset_popup_output = no_update # Popup if the dataset is in use
 
     triggered_id = ctx.triggered_id
     if triggered_id == 'cancel-dataset-delete-btn':
-        is_popup_open = False
+        delete_dataset_popup_output = False
+    elif triggered_id == 'used-cancel-dataset-delete-btn':
+        used_delete_dataset_popup_output = False
     elif isinstance(triggered_id, dict) and triggered_id.get('sub_type') and triggered_id.get('sub_type') == 'delete':
         # Prevents update if the n_clicks started the function but wasn't clicked
         # Happens when the card is created
@@ -309,19 +326,28 @@ def delete_dataset_popup(
                     if input_['id'] == triggered_id:
                         if n_clicks_dataset_cards[index] is None:
                             raise PreventUpdate
-        is_popup_open = True
+
+        with session_maker() as session:
+            if dataset_is_connected_to_traces(triggered_id['id'], session):
+                used_delete_dataset_popup_output = True
+            else:
+                delete_dataset_popup_output = True
         dataset_id_to_delete_output = triggered_id['id']
-    elif triggered_id == 'delete-dataset-btn':
+
+
+    elif triggered_id == 'delete-dataset-btn' or triggered_id == 'used-delete-dataset-btn':
         with session_maker() as session:
             delete_dataset(dataset_id_to_delete, session)
             deleted_dataset_trigger = datasets_count(session) # If i deleted it will never be the same number as before
         
-        is_popup_open = False
+        delete_dataset_popup_output = False
+        used_delete_dataset_popup_output = False
 
     return (
-        is_popup_open,
+        delete_dataset_popup_output,
         dataset_id_to_delete_output,
-        deleted_dataset_trigger # Triggers the build of the cards container
+        deleted_dataset_trigger, # Triggers the build of the cards container
+        used_delete_dataset_popup_output
     )
 
 

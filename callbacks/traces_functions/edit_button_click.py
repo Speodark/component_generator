@@ -74,12 +74,20 @@ def edit_button_click(
 
     datasets_dropdown_value_output = trace.dataset_id
     traces_type_dropdown_value_output = trace.args['type'].capitalize()
-    dataset = None
-    if trace.dataset_id:
+
+    # Handle data container childrens
+    if not trace.dataset_id and not traces_type_dropdown_value_output:
+        data_container_children_output = "Choose a dataset and a trace type!"
+    elif not trace.dataset_id:
+        data_container_children_output = "Choose a dataset!"
+    elif not traces_type_dropdown_value_output:
+        data_container_children_output = "Choose a Type!"
+    else:
+        dataset = None
         with session_maker() as session:
             dataset = pd.DataFrame(get_dataset(trace.dataset_id, session).data)
-    active_columns = trace.active_columns
-    data_container_children_output = charts_dict[traces_type_dropdown_value_output].data_arg(dataset, active_columns)
+        active_columns = trace.active_columns
+        data_container_children_output = charts_dict[traces_type_dropdown_value_output].data_arg(dataset, active_columns)
 
     # Which arguments to show
     for state_type in ctx.states_list:

@@ -65,7 +65,6 @@ def delete_dataset_popup():
         children=html.Div(
             className='dashboard__delete-popup',
             children=[
-                dcc.Store(id='dataset_id_to_delete'),
                 html.Span(
                     className='dashboard__delete-popup--title',
                     children='Are you sure you want to delete the dataset?'
@@ -84,6 +83,47 @@ def delete_dataset_popup():
                 html.Button(
                     id='cancel-dataset-delete-btn',
                     className='btn__blue dashboard__delete-popup--cancel',
+                    children='Cancel'
+                ),
+            ]
+        ),
+    )
+
+
+def used_delete_dataset_popup():
+    return dbc.Modal(
+        id='used-delete-dataset-popup',
+        size='md',
+        centered=True,
+        children=html.Div(
+            className='delete-used-dataset',
+            children=[
+                html.Span(
+                    className='delete-used-dataset--title',
+                    children='This Dataset Is In Use!'
+                ),
+                html.Span(
+                    className='delete-used-dataset--warning',
+                    children="Every Trace from every component you have will loss its data!"
+                ),
+                html.Span(
+                    className='delete-used-dataset--warning',
+                    children="You won't be able to retrieve the dataset information!"
+                ),
+                html.Span(
+                    className='delete-used-dataset--title',
+                    children='Are you sure you want to delete the dataset?'
+                ),
+                # Delete the component
+                html.Button(
+                    id='used-delete-dataset-btn',
+                    className='btn__red delete-used-dataset--delete',
+                    children='Delete'
+                ),
+                # Cancel
+                html.Button(
+                    id='used-cancel-dataset-delete-btn',
+                    className='btn__blue delete-used-dataset--cancel',
                     children='Cancel'
                 ),
             ]
@@ -195,9 +235,12 @@ def dashboard_data_tab(session_maker):
 
             # Pop Ups
             add_dataset_popup(),
-            delete_dataset_popup(),
             rename_dataset_popup(),
             show_table_popup(),
+            # DELETE DATASET POPUPS
+            dcc.Store(id='dataset_id_to_delete'),
+            delete_dataset_popup(),
+            used_delete_dataset_popup(),
             # Data stores
             dcc.Store(id='uploaded_data')
         ]

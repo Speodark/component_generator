@@ -329,6 +329,29 @@ body {
     padding-left: 2rem;
     border: 1.5px solid blue; }
 
+.delete-used-dataset {
+  display: grid;
+  grid-template-rows: repeat(5, max-content);
+  padding: 1.5rem;
+  gap: 1rem; }
+  .delete-used-dataset--title {
+    font-size: 1.8em;
+    text-align: center; }
+  .delete-used-dataset--warning {
+    font-size: 2em;
+    color: red;
+    text-align: center; }
+  .delete-used-dataset--delete {
+    grid-row: -2/-1;
+    grid-column: 1/2;
+    width: max-content;
+    place-self: end; }
+  .delete-used-dataset--cancel {
+    grid-row: -2/-1;
+    grid-column: 1/2;
+    width: max-content;
+    place-self: start; }
+
 .dashboard {
   height: 100%;
   width: 100%;

@@ -21,6 +21,8 @@ def get_all_components(session: Session):
 
 def get_newest_component(session: Session):
     return session.query(Components).order_by(Components.created_at.desc()).first()
+
+
 # DATASETS
 def dataset_name_exists(name: str, session: Session) -> bool:
     result = session.query(Datasets).filter_by(name=name).first()
@@ -39,6 +41,13 @@ def get_all_datasets(session: Session):
 def get_dataset(dataset_id: int, session: Session):
     return session.query(Datasets).filter_by(id=dataset_id).first()
 
+
+def dataset_is_connected_to_traces(dataset_id: int, session: Session) -> bool:
+    # query for traces with the given dataset ID
+    traces = session.query(Traces).filter_by(dataset_id=dataset_id).all()
+
+    # return True if there are any traces with the given dataset ID, False otherwise
+    return bool(traces)
 # Traces
 def trace_name_exists(component_id: int, trace_name: str, session: Session) -> bool:
     result = session.query(exists().where(Traces.component_id == component_id).where(Traces.trace_name == trace_name)).scalar()
