@@ -240,7 +240,6 @@ def trace_arguments_popup(
     trace_inputs_arg_name = []
     trace_dropdowns_arg_name = []
     trace_cards_ids_by_order = []
-
     
     for output in ctx.outputs_list:
         if isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'input':
@@ -300,6 +299,7 @@ def trace_arguments_popup(
             session_maker,
             sub_type_inputs_output,
             sub_type_dropdowns_output,
+            trace_dropdowns_arg_name,
             trace_inputs_arg_name,
             trace_args_classnames,
             # Output args
@@ -312,55 +312,87 @@ def trace_arguments_popup(
 
 
     # If the dataset dropdown triggered
-    elif triggered_id in 'trace-arg-dataset-dropdown':
-        dataset = None
-        with session_maker() as session:
-            dataset = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
-        data_container_children_output = charts_dict[trace_type].data_arg(dataset, None)
+    elif triggered_id in ['trace-arg-dataset-dropdown', 'trace-arg-type-dropdown']:
+        if not choosen_dataset_id and not trace_type:
+            data_container_children_output = "Choose a dataset and a trace type!"
+        elif not choosen_dataset_id:
+            data_container_children_output = "Choose a dataset!"
+        elif not trace_type:
+            data_container_children_output = "Choose a Type!"
+        else:
+            dataset = None
+            with session_maker() as session:
+                dataset = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
+            data_container_children_output = charts_dict[trace_type].data_arg(dataset, None)
+        
+        if triggered_id == 'trace-arg-type-dropdown':
+            # Which arguments to show
+            for state_type in ctx.states_list:
+                if isinstance(state_type, list) and state_type and state_type[0]['id'].get('sub_type') == 'divider':
+                    for index, state_ in enumerate(state_type):
+                        if state_['id']['arg_name'] in charts_dict[trace_type].args_list:
+                            trace_args_classnames[index] = trace_args_classnames[index].replace('hide', '')
+                        else:
+                            trace_args_classnames[index] = trace_args_classnames[index] if 'hide' in trace_args_classnames[index] \
+                                                            else trace_args_classnames[index] + ' hide'
+            trace_args_classnames_output = trace_args_classnames
 
-    ################################## BUILD ARGS AND FIG
-    # new_fig_args = new_figure_args(trace, trace_dropdowns, trace_inputs)
-    # fig_json = getattr(go, trace_type)(**new_fig_args).to_plotly_json()\
-    # update_trace(store_trace_id, fig_json, session)
-    ##################################
+
+    
 
     # If the apply button was clicked
-    elif triggered_id in ['apply-arg-changes','trace-arg-type-dropdown']:
+    elif triggered_id == 'apply-arg-changes':
         # Get the trace
         trace = get_trace_object(session_maker, store_trace_id)
 
+        # Update db list
+        update_db_functions_list = []
+        # Current fig_data
+        if trace.dataset_id is not None and trace.active_columns is not None and None not in trace.active_columns.values():
+            with session_maker() as session:
+                df = pd.DataFrame(get_dataset(trace.dataset_id, session).data)
+                fig_data = {
+                    arg_name : df[column_name].tolist()
+                    for arg_name, column_name in  trace.active_columns.items()
+                }
+        else:
+            fig_data = {}
+        # Fig json
+        fig_json = {} # Creates it as a pointer for later
         ###### Handle the dataset #####
         if choosen_dataset_id != trace.dataset_id:
             if choosen_dataset_id:
-                with session_maker() as session:
-                    update_trace_dataset(trace.id, choosen_dataset_id, session)
-                updated_trace_trigger_output = datetime.now()
+                update_db_functions_list.append((update_trace_dataset, (trace.id, choosen_dataset_id)))
+
+
+        ###### Handle the type #####
+        current_trace_type = trace.args['type'].capitalize()
+        if current_trace_type != trace_type:
+            update_db_functions_list.append((update_trace_active_columns, (store_trace_id, None)))
             
+             
         ###### Handle the data #####
         # Get the new active columns
         if choosen_dataset_id:
+            # if the curreent active_columns of the trace is none i neeed it to be a dict
             current_active_columns = trace.active_columns if trace.active_columns is not None else {}
             active_columns = {}
             if any(x is not None for x in data_section_dd):
                 for state_type in ctx.states_list:
                     if isinstance(state_type, list) and state_type and state_type[0]['id'].get('section') == 'data':
-                        for index, state_ in enumerate(state_type):
+                        for state_ in state_type:
                             active_columns[state_['id']['arg_name']] = state_['value']
             # Update if the active columns changes
             if current_active_columns != active_columns:
-                with session_maker() as session:
-                    if None not in data_section_dd:
+                if None not in data_section_dd:
+                    with session_maker() as session:
                         df = pd.DataFrame(get_dataset(trace.dataset_id, session).data)
                         fig_data = {
                             arg_name : df[column_name].tolist()
                             for arg_name, column_name in active_columns.items()
                         }
-                        fig_json = getattr(go, trace_type)(name=trace.trace_name, **fig_data).to_plotly_json()
-                    else:
-                        fig_json = getattr(go, trace_type)(name=trace.trace_name).to_plotly_json()
-                    update_trace(store_trace_id, fig_json, session)
-                    update_trace_active_columns(store_trace_id, active_columns, session)
-                updated_trace_trigger_output = datetime.now()
+                
+                update_db_functions_list.append((update_trace_active_columns, (store_trace_id, active_columns)))
 
 
         ###### Handle the name #####
@@ -379,25 +411,32 @@ def trace_arguments_popup(
                 if name_already_exists:
                     sub_type_inputs_error_output[trace_inputs_arg_name.index('name')] = 'This name is already taken'
                 else:
-                    with session_maker() as session:
-                        update_trace_name(store_trace_id, new_trace_name, session)
+                    update_db_functions_list.append((update_trace, (store_trace_id, new_trace_name)))
                     sub_type_inputs_error_output[trace_inputs_arg_name.index('name')] = None
                     trace_card_name_output[trace_cards_ids_by_order.index(store_trace_id)] = new_trace_name
 
 
-        ###### Handle the type #####
-        current_trace_type = trace.args['type'].capitalize()
-        if current_trace_type != trace_type:
-            if not trace_type:
-                data_container_children_output = []
-            else:
-                fig_json = getattr(go, trace_type)(name=trace.trace_name).to_plotly_json()
-                with session_maker() as session:
-                    update_trace(store_trace_id, fig_json, session)
-                    update_trace_active_columns(store_trace_id, None, session)
-                    dataset = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
-                data_container_children_output = charts_dict[trace_type].data_arg(dataset, None)
-                updated_trace_trigger_output = datetime.now()
+        # Build the figure and if it was changed add the update figure function
+        ################################## GET ARGS AND BUILD FIG
+        new_fig_args = new_figure_args(trace_type, trace_dropdowns, trace_inputs)
+        fig_json.update(getattr(go, trace_type)(**fig_data, **new_fig_args).to_plotly_json())
+        ##################################
+        if trace.args != fig_json:
+            update_db_functions_list.append((update_trace, (store_trace_id, fig_json)))
+        
+
+        # If i added/updated anything I only want to do it if everything went well and there's no error
+        # Inserting anything to the db
+        # Only if this is true something actually changed and we need to create the figure from scratch
+        if update_db_functions_list:
+            
+            with session_maker() as session:
+                for func, args in update_db_functions_list:
+                    func(*args, session, commit=False)
+                session.commit()
+            updated_trace_trigger_output = datetime.now()
+
+
     return (
         popup_is_open_output,
         trace_id_args_output,

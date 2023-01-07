@@ -5,11 +5,10 @@ from utilities.db import (
     get_trace
 )
 
-def new_figure_args(trace, trace_dropdowns, trace_inputs):
-
+def new_figure_args(trace_type, trace_dropdowns, trace_inputs):
     def insert_to_dict(new_fig_args, state_type, state_values):
         for index, state_ in enumerate(state_type):
-            if state_['id']['arg_name'] in charts_dict[trace.args['type'].capitalize()].args_list:
+            if state_['id']['arg_name'] in charts_dict[trace_type].args_list:
                 new_fig_args[state_['id']['arg_name']] = state_values[index]
         return new_fig_args
 
@@ -21,7 +20,6 @@ def new_figure_args(trace, trace_dropdowns, trace_inputs):
 
             elif state_type[0]['id'].get('sub_type') == 'input':
                 new_fig_args = insert_to_dict(new_fig_args, state_type, trace_inputs)
-
     return new_fig_args
 
 

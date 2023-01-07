@@ -15,6 +15,7 @@ def edit_button_click(
     session_maker,
     sub_type_inputs_output,
     sub_type_dropdowns_output,
+    trace_dropdowns_arg_name,
     trace_inputs_arg_name,
     trace_args_classnames,
     # Output args
@@ -63,10 +64,13 @@ def edit_button_click(
     # sub_type_inputs_output[trace_inputs_arg_name.index('name')] = trace.trace_name
     for output in ctx.outputs_list:
         if isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'input':
-            arg_name = output[0]['id']['arg_name']
-            sub_type_inputs_output[trace_inputs_arg_name.index(arg_name)] = trace_args.get(arg_name, no_update)
+            for _output in output:
+                arg_name = _output['id']['arg_name']
+                sub_type_inputs_output[trace_inputs_arg_name.index(arg_name)] = trace_args.get(arg_name, no_update)
         elif isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'dropdown':
-            sub_type_dropdowns_output[trace_inputs_arg_name.index(arg_name)] = trace_args.get(arg_name, no_update)
+            for _output in output:
+                arg_name = _output['id']['arg_name']
+                sub_type_dropdowns_output[trace_dropdowns_arg_name.index(arg_name)] = trace_args.get(arg_name, no_update)
 
     datasets_dropdown_value_output = trace.dataset_id
     traces_type_dropdown_value_output = trace.args['type'].capitalize()

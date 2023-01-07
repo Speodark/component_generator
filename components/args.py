@@ -19,7 +19,7 @@ class Args:
                 html.Label('Visible:'),
                 dcc.Dropdown(
                     options=options,
-                    value=True,
+                    value=options[0]['value'],
                     clearable=False,
                     className='trace-arg__dropdown',
                     id={'type':'trace_arg', 'sub_type':'dropdown', 'arg_name':'visible'},
