@@ -226,6 +226,7 @@ def dashboard_data_tab(session_maker):
             dcc.Store(id='deleted_dataset_trigger',data=0),
             dcc.Store(id='added_dataset_trigger',data=0),
             dcc.Store(id='rename_dataset_trigger',data=0),
+            dcc.Store(id='update_figure_delete_dataset', data=0),
             html.Div(
                 className='fill-parent-div dashboard__data-tab--datasets-container',
                 id='dataset-cards-container',

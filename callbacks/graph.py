@@ -14,12 +14,14 @@ session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.d
     Input('added-trace-trigger','data'),
     Input('deleted_trace_trigger', 'data'),
     Input('updated_trace_trigger', 'data'),
+    Input('update_figure_delete_dataset', 'data'),
 )
 def update_figure(
     component_id,
     _,
     __,
-    ___
+    ___,
+    ____,
 ):
     traces = []
     with session_maker() as session:

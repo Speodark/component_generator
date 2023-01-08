@@ -17,8 +17,11 @@ from utilities.db import (
     delete_dataset, 
     rename_dataset, 
     get_dataset, 
-    dataset_is_connected_to_traces
+    dataset_is_connected_to_traces,
+    get_traces_by_dataset_id,
+    update_trace
 )
+from components.charts import charts_dict
 from components import trace_dataset_card
 session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
 
@@ -291,12 +294,14 @@ def open_add_dataset_popup(
     Output('dataset_id_to_delete', 'value'),
     Output('deleted_dataset_trigger', 'data'),
     Output('used-delete-dataset-popup', 'is_open'),
+    Output('update_figure_delete_dataset', 'data'),
     Input({'type':'dataset_card','id':ALL,'sub_type':'delete'}, 'n_clicks'),
     Input('cancel-dataset-delete-btn', 'n_clicks'),
     Input('delete-dataset-btn','n_clicks'),
     Input('used-cancel-dataset-delete-btn', 'n_clicks'),
     Input('used-delete-dataset-btn', 'n_clicks'),
     State('dataset_id_to_delete', 'value'),
+    State('components-dropdown', 'value'),
     prevent_initial_call = True
 )
 def delete_dataset_popup(
@@ -305,12 +310,14 @@ def delete_dataset_popup(
     ___,
     _,
     ____,
-    dataset_id_to_delete
+    dataset_id_to_delete,
+    component_id
 ):
     delete_dataset_popup_output = no_update
     dataset_id_to_delete_output = no_update
     deleted_dataset_trigger = no_update # Triggers the build of the cards container
     used_delete_dataset_popup_output = no_update # Popup if the dataset is in use
+    update_figure_delete_dataset_output = no_update # If we update figure args after deleting a dataset we want to update the figure
 
     triggered_id = ctx.triggered_id
     if triggered_id == 'cancel-dataset-delete-btn':
@@ -337,6 +344,19 @@ def delete_dataset_popup(
 
     elif triggered_id == 'delete-dataset-btn' or triggered_id == 'used-delete-dataset-btn':
         with session_maker() as session:
+            if dataset_is_connected_to_traces(dataset_id_to_delete, session):
+                traces = get_traces_by_dataset_id(dataset_id_to_delete, session)
+                traces_in_current_component = False
+                for trace in traces:
+                    if trace.component_id == component_id:
+                        traces_in_current_component = True
+                    args = trace.args
+                    chart_type_args = charts_dict[trace.args['type'].capitalize()].args_list
+                    new_trace_args = {k: v for k, v in args.items() if k in chart_type_args or k == "type"}
+                    update_trace(trace.id, new_trace_args, session)
+                if traces_in_current_component:
+                    update_figure_delete_dataset_output = datetime.now()
+
             delete_dataset(dataset_id_to_delete, session)
             deleted_dataset_trigger = datasets_count(session) # If i deleted it will never be the same number as before
         
@@ -347,7 +367,8 @@ def delete_dataset_popup(
         delete_dataset_popup_output,
         dataset_id_to_delete_output,
         deleted_dataset_trigger, # Triggers the build of the cards container
-        used_delete_dataset_popup_output
+        used_delete_dataset_popup_output,
+        update_figure_delete_dataset_output
     )
 
 

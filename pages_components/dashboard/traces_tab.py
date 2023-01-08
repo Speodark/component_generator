@@ -259,6 +259,47 @@ def arguments_popup():
     )
 
 
+def dont_save_changes_popup():
+    return dbc.Modal(
+        id='used-delete-dataset-popup',
+        size='md',
+        centered=True,
+        children=html.Div(
+            className='delete-used-dataset',
+            children=[
+                html.Span(
+                    className='delete-used-dataset--title',
+                    children='This Dataset Is In Use!'
+                ),
+                html.Span(
+                    className='delete-used-dataset--warning',
+                    children="Every Trace from every component you have will loss its data!"
+                ),
+                html.Span(
+                    className='delete-used-dataset--warning',
+                    children="You won't be able to retrieve the dataset information!"
+                ),
+                html.Span(
+                    className='delete-used-dataset--title',
+                    children='Are you sure you want to delete the dataset?'
+                ),
+                # Delete the component
+                html.Button(
+                    id='used-delete-dataset-btn',
+                    className='btn__red delete-used-dataset--delete',
+                    children='Delete'
+                ),
+                # Cancel
+                html.Button(
+                    id='used-cancel-dataset-delete-btn',
+                    className='btn__blue delete-used-dataset--cancel',
+                    children='Cancel'
+                ),
+            ]
+        ),
+    )
+
+
 def dashboard_traces_tab(session_maker):
     traces_cards = []
     num_of_datasets = None

@@ -386,7 +386,7 @@ def trace_arguments_popup(
             if current_active_columns != active_columns:
                 if None not in data_section_dd:
                     with session_maker() as session:
-                        df = pd.DataFrame(get_dataset(trace.dataset_id, session).data)
+                        df = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
                         fig_data = {
                             arg_name : df[column_name].tolist()
                             for arg_name, column_name in active_columns.items()
