@@ -411,7 +411,7 @@ def open_reename_popup(
     # Close the popup and saves the data.
     if triggered_id == 'rename-dataset-cancel-btn':
         pop_up_open_output = False
-    elif isinstance(triggered_id, dict) and triggered_id.get('sub_type') and triggered_id.get('sub_type') == 'rename':
+    elif isinstance(triggered_id, dict) and triggered_id.get('sub_type') and triggered_id.get('sub_type') == 'edit':
         # Prevents update if the n_clicks started the function but wasn't clicked
         # Happens when the card is created
         for input_type in ctx.inputs_list:
@@ -442,7 +442,6 @@ def open_reename_popup(
             else:
                 # If all good with the name checks
                 # add dataset
-                print(dataset_id_to_rename)
                 with session_maker() as session:
                     rename_dataset(dataset_id_to_rename, dataset_name, session)
             
