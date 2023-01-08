@@ -259,40 +259,32 @@ def arguments_popup():
     )
 
 
-def dont_save_changes_popup():
+def delete_dataset_popup():
     return dbc.Modal(
-        id='used-delete-dataset-popup',
+        id='dont_save_changes_popup',
         size='md',
         centered=True,
         children=html.Div(
-            className='delete-used-dataset',
+            className='dashboard__delete-popup',
             children=[
                 html.Span(
-                    className='delete-used-dataset--title',
-                    children='This Dataset Is In Use!'
+                    className='dashboard__delete-popup--title',
+                    children='Are you sure you Want to close the window??'
                 ),
                 html.Span(
-                    className='delete-used-dataset--warning',
-                    children="Every Trace from every component you have will loss its data!"
-                ),
-                html.Span(
-                    className='delete-used-dataset--warning',
-                    children="You won't be able to retrieve the dataset information!"
-                ),
-                html.Span(
-                    className='delete-used-dataset--title',
-                    children='Are you sure you want to delete the dataset?'
+                    className='dashboard__delete-popup--warning',
+                    children="You haven't applied some of the changes!"
                 ),
                 # Delete the component
                 html.Button(
-                    id='used-delete-dataset-btn',
-                    className='btn__red delete-used-dataset--delete',
-                    children='Delete'
+                    id='dont_save_changes_confirm',
+                    className='btn__red dashboard__delete-popup--delete',
+                    children='Confirm'
                 ),
                 # Cancel
                 html.Button(
-                    id='used-cancel-dataset-delete-btn',
-                    className='btn__blue delete-used-dataset--cancel',
+                    id='dont_save_changes_cancel',
+                    className='btn__blue dashboard__delete-popup--cancel',
                     children='Cancel'
                 ),
             ]
@@ -325,6 +317,7 @@ def dashboard_traces_tab(session_maker):
             create_trace_popup(session_maker),
             dcc.Store(id='deleted_trace_trigger'),
             delete_trace_popup(),
-            arguments_popup()
+            arguments_popup(),
+            delete_dataset_popup()
         ]
     )

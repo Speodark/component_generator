@@ -206,11 +206,14 @@ def update_traces_container(
     Output('updated_trace_trigger', 'data'),
     Output({'type':'trace_arg', 'sub_type':'divider', 'arg_name':ALL}, 'className'),
     Output({'type':'trace_arg', 'sub_type':'dropdown', 'arg_name':ALL}, 'value'),
+    Output('dont_save_changes_popup', 'is_open'),
     Input({'type':'trace_card','id':ALL,'sub_type':'edit'}, 'n_clicks'),
     Input('close-arg-popup', 'n_clicks'),
     Input('apply-arg-changes','n_clicks'),
     Input('trace-arg-dataset-dropdown', 'value'),
     Input('trace-arg-type-dropdown', 'value'),
+    Input('dont_save_changes_confirm','n_clicks'),
+    Input('dont_save_changes_cancel','n_clicks'),
     State('trace_id_args','data'),
     State({'type':'trace_arg', 'sub_type':'dropdown', 'section': 'data', 'arg_name':ALL} ,'value'),
     State({'type':'trace_arg', 'sub_type':'input', 'arg_name':ALL}, 'value'),
@@ -225,6 +228,8 @@ def trace_arguments_popup(
     __,
     choosen_dataset_id,
     trace_type,
+    ___,
+    ____,
     # States
     store_trace_id,
     data_section_dd,
@@ -270,12 +275,45 @@ def trace_arguments_popup(
     updated_trace_trigger_output = no_update
     trace_args_classnames_output = [no_update for x in range(num_of_args)]
     sub_type_dropdowns_output = [no_update for x in range(num_sub_type_dropdowns)] # The dropdowns values
+    dont_save_changes_popup_output = no_update # is the dont save changes popup is open?
 
     triggered_id = ctx.triggered_id
     # If the close button was clicked
-    if triggered_id == 'close-arg-popup':
+    if triggered_id == 'dont_save_changes_cancel':
+        dont_save_changes_popup_output = False
+    elif triggered_id == 'dont_save_changes_confirm':
+        dont_save_changes_popup_output = False
         popup_is_open_output = False
         trace_id_args_output = None
+    elif triggered_id == 'close-arg-popup':
+        # Checks if there are any changes if yes ask the user to confirm else close
+        trace = get_trace_object(session_maker, store_trace_id)
+        fig_data = get_fig_data(
+            trace,
+            session_maker
+        )
+        changed_fig_data, _ = update_fig_data(
+            choosen_dataset_id,
+            trace,
+            data_section_dd,
+            session_maker,
+            update_trace_active_columns,
+            store_trace_id,
+            fig_data
+        )
+        new_fig_args = new_figure_args(trace_type, trace_dropdowns, trace_inputs)
+        fig_json = getattr(go, trace_type)(**fig_data, **new_fig_args).to_plotly_json()
+        ##################################
+        if (
+            trace.args != fig_json or  # Did the args change
+            changed_fig_data or # Did the data change?
+            choosen_dataset_id != trace.dataset_id or # Did the dataset change?
+            trace_type != trace.args['type'].capitalize() # Did the type change
+            ):
+            dont_save_changes_popup_output = True
+        else:
+            popup_is_open_output = False
+            trace_id_args_output = None
     # If trigger is the edit button of the trace
     elif (
         isinstance(triggered_id, dict) and 
@@ -342,21 +380,17 @@ def trace_arguments_popup(
 
     # If the apply button was clicked
     elif triggered_id == 'apply-arg-changes':
+        is_there_an_error = False
         # Get the trace
         trace = get_trace_object(session_maker, store_trace_id)
 
         # Update db list
         update_db_functions_list = []
         # Current fig_data
-        if trace.dataset_id is not None and trace.active_columns is not None and None not in trace.active_columns.values():
-            with session_maker() as session:
-                df = pd.DataFrame(get_dataset(trace.dataset_id, session).data)
-                fig_data = {
-                    arg_name : df[column_name].tolist()
-                    for arg_name, column_name in  trace.active_columns.items()
-                }
-        else:
-            fig_data = {}
+        fig_data = get_fig_data(
+            trace,
+            session_maker
+        )
         # Fig json
         fig_json = {} # Creates it as a pointer for later
         ###### Handle the dataset #####
@@ -373,26 +407,19 @@ def trace_arguments_popup(
              
         ###### Handle the data #####
         # Get the new active columns
-        if choosen_dataset_id:
-            # if the curreent active_columns of the trace is none i neeed it to be a dict
-            current_active_columns = trace.active_columns if trace.active_columns is not None else {}
-            active_columns = {}
-            if any(x is not None for x in data_section_dd):
-                for state_type in ctx.states_list:
-                    if isinstance(state_type, list) and state_type and state_type[0]['id'].get('section') == 'data':
-                        for state_ in state_type:
-                            active_columns[state_['id']['arg_name']] = state_['value']
-            # Update if the active columns changes
-            if current_active_columns != active_columns:
-                if None not in data_section_dd:
-                    with session_maker() as session:
-                        df = pd.DataFrame(get_dataset(choosen_dataset_id, session).data)
-                        fig_data = {
-                            arg_name : df[column_name].tolist()
-                            for arg_name, column_name in active_columns.items()
-                        }
-                
-                update_db_functions_list.append((update_trace_active_columns, (store_trace_id, active_columns)))
+        # The function changes updates the fig_data if neccessery
+        # And add the update db function
+        changed_fig_data, active_columns = update_fig_data(
+            choosen_dataset_id,
+            trace,
+            data_section_dd,
+            session_maker,
+            update_trace_active_columns,
+            store_trace_id,
+            fig_data
+        )
+        if changed_fig_data:
+            update_db_functions_list.append((update_trace_active_columns, (store_trace_id, active_columns)))
 
 
         ###### Handle the name #####
@@ -400,9 +427,11 @@ def trace_arguments_popup(
         if new_trace_name != trace.trace_name:
             if not new_trace_name:
                 sub_type_inputs_error_output[trace_inputs_arg_name.index('name')] = 'You must provide a name'
+                is_there_an_error = True
             # Is the name longer than 3 characters?
             elif len(new_trace_name) < 3:
                 sub_type_inputs_error_output[trace_inputs_arg_name.index('name')] = 'The name must be 3 characters or more'
+                is_there_an_error = True
             else:
                 # Checks if the name already exists in the database
                 name_already_exists = False
@@ -410,6 +439,7 @@ def trace_arguments_popup(
                     name_already_exists = trace_name_exists(component_id, new_trace_name, session)
                 if name_already_exists:
                     sub_type_inputs_error_output[trace_inputs_arg_name.index('name')] = 'This name is already taken'
+                    is_there_an_error = True
                 else:
                     update_db_functions_list.append((update_trace, (store_trace_id, new_trace_name)))
                     sub_type_inputs_error_output[trace_inputs_arg_name.index('name')] = None
@@ -428,8 +458,7 @@ def trace_arguments_popup(
         # If i added/updated anything I only want to do it if everything went well and there's no error
         # Inserting anything to the db
         # Only if this is true something actually changed and we need to create the figure from scratch
-        if update_db_functions_list:
-            
+        if update_db_functions_list and not is_there_an_error:
             with session_maker() as session:
                 for func, args in update_db_functions_list:
                     func(*args, session, commit=False)
@@ -449,5 +478,6 @@ def trace_arguments_popup(
         trace_card_name_output,
         updated_trace_trigger_output,
         trace_args_classnames_output,
-        sub_type_dropdowns_output
+        sub_type_dropdowns_output,
+        dont_save_changes_popup_output
     )
