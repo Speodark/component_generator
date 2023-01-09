@@ -1,12 +1,16 @@
 import plotly.graph_objects as go
 from dash import html, dcc
+from components import Args
 import pandas as pd
 
-class Bar:
+class Bar(Args):
     # DONT HAVE LEGEND ONLY
     args_list = [
         'name',
-        'visible'
+        'visible',
+        'showlegend',
+        'legendrank',
+        'legendgroup'
     ]
     
     @staticmethod

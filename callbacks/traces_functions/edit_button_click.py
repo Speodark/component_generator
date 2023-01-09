@@ -2,12 +2,14 @@ from dash import ctx, no_update
 from dash.exceptions import PreventUpdate
 import pandas as pd
 from components.charts import charts_dict
-
+from components import Args
 from utilities.db import (
     get_trace,
     get_all_datasets,
     get_dataset
 )
+
+args_builder = Args()
 
 def edit_button_click(
     # Regular args
@@ -58,7 +60,7 @@ def edit_button_click(
         print("In edit button click trace is None weird check this out!")
         raise PreventUpdate
 
-
+    chart_arg_builder = charts_dict[trace.args['type'].capitalize()]()
     # If there is a trace I want to update all the arguments to be by that trace
     trace_args = trace.args
     # sub_type_inputs_output[trace_inputs_arg_name.index('name')] = trace.trace_name
@@ -66,7 +68,10 @@ def edit_button_click(
         if isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'input':
             for _output in output:
                 arg_name = _output['id']['arg_name']
-                sub_type_inputs_output[trace_inputs_arg_name.index(arg_name)] = trace_args.get(arg_name, no_update)
+                arg_value = trace_args.get(arg_name, None)
+                if arg_value is None:
+                    arg_value = getattr(chart_arg_builder, arg_name + "_default")()
+                sub_type_inputs_output[trace_inputs_arg_name.index(arg_name)] = arg_value
         elif isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'dropdown':
             for _output in output:
                 arg_name = _output['id']['arg_name']

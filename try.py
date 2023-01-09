@@ -1,16 +1,20 @@
-class Parent:
-    def func1(self):
-        self.func2()
-    
-    def func2(self):
-        print('I am func2 from the parent')
+import dash_mantine_components as dmc
+from dash_iconify import DashIconify
 
-class Child(Parent):
-    def func2(self):
-        print('I am func2 from the child')
+import dash
+from dash import html, dcc
 
-# Create an instance of the Child class
-child = Child()
+app = dash.Dash()
 
-# Call the func1 function on the Child instance
-child.func1()
+app.layout = html.Div([
+    dmc.NumberInput(
+        label="Your weight in kg",
+        value=5,
+        style={"width": 200},
+        precision=0,
+        hideControls = True
+    )
+])
+
+if __name__ == '__main__':
+    app.run_server()

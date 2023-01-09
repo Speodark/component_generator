@@ -229,7 +229,11 @@ def arguments_popup():
                             # INFO
                             dmc.TabsPanel(
                                 children=[
-                                    args_builder.visible()
+                                    args_builder.visible(),
+                                    args_builder.showlegend(),
+                                    args_builder.legendrank(),
+                                    args_builder.legendgroup(),
+
                                 ], 
                                 value='Style',
                                 className='trace-arg__info-tab'
