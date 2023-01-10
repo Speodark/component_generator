@@ -206,6 +206,7 @@ def update_traces_container(
     Output('updated_trace_trigger', 'data'),
     Output({'type':'trace_arg', 'sub_type':'divider', 'arg_name':ALL}, 'className'),
     Output({'type':'trace_arg', 'sub_type':'dropdown', 'arg_name':ALL}, 'value'),
+    Output({'type':'trace_arg', 'sub_type':'dropdown', 'arg_name':ALL}, 'options'),
     Output('dont_save_changes_popup', 'is_open'),
     Input({'type':'trace_card','id':ALL,'sub_type':'edit'}, 'n_clicks'),
     Input('close-arg-popup', 'n_clicks'),
@@ -274,7 +275,8 @@ def trace_arguments_popup(
     trace_card_name_output = [no_update for x in range(numer_of_trace_cards)] # The names of all the traces cards
     updated_trace_trigger_output = no_update
     trace_args_classnames_output = [no_update for x in range(num_of_args)]
-    sub_type_dropdowns_output = [no_update for x in range(num_sub_type_dropdowns)] # The dropdowns values
+    sub_type_dropdowns_value_output = [no_update for x in range(num_sub_type_dropdowns)] # The dropdowns values
+    sub_type_dropdowns_options_output = [no_update for x in range(num_sub_type_dropdowns)] # The dropdowns options
     dont_save_changes_popup_output = no_update # is the dont save changes popup is open?
 
     triggered_id = ctx.triggered_id
@@ -310,6 +312,7 @@ def trace_arguments_popup(
             choosen_dataset_id != trace.dataset_id or # Did the dataset change?
             trace_type != trace.args['type'].capitalize() # Did the type change
             ):
+            # print(trace.args != fig_json, changed_fig_data, choosen_dataset_id != trace.dataset_id, trace_type != trace.args['type'].capitalize())
             dont_save_changes_popup_output = True
         else:
             popup_is_open_output = False
@@ -336,11 +339,12 @@ def trace_arguments_popup(
             trace_n_clicks,
             session_maker,
             sub_type_inputs_output,
-            sub_type_dropdowns_output,
             trace_dropdowns_arg_name,
             trace_inputs_arg_name,
             trace_args_classnames,
             # Output args
+            sub_type_dropdowns_value_output,
+            sub_type_dropdowns_options_output,
             trace_id_args_output,
             datasets_dropdown_options_output,
             datasets_dropdown_value_output,
@@ -478,6 +482,7 @@ def trace_arguments_popup(
         trace_card_name_output,
         updated_trace_trigger_output,
         trace_args_classnames_output,
-        sub_type_dropdowns_output,
+        sub_type_dropdowns_value_output,
+        sub_type_dropdowns_options_output,
         dont_save_changes_popup_output
     )

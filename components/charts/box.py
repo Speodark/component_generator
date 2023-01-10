@@ -1,11 +1,17 @@
 import plotly.graph_objects as go
 from dash import html, dcc
+from components import Args
 import pandas as pd
 
-class Box:
+
+class Box(Args):
     # DONT HAVE legendonly
     args_list = [
         'name',
+        'visible',
+        'showlegend',
+        'legendrank',
+        'legendgroup'
     ]
 
     @staticmethod
@@ -29,4 +35,12 @@ class Box:
                     )
                 ]
             ),
+        ]
+
+
+    # VISIBLE
+    def visible_default(self):
+        return [
+            {'label': 'True', 'value': True},
+            {'label': 'False', 'value': False}
         ]

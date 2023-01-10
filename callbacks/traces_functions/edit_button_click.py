@@ -16,11 +16,12 @@ def edit_button_click(
     trace_n_clicks,
     session_maker,
     sub_type_inputs_output,
-    sub_type_dropdowns_output,
     trace_dropdowns_arg_name,
     trace_inputs_arg_name,
     trace_args_classnames,
     # Output args
+    sub_type_dropdowns_value_output,
+    sub_type_dropdowns_options_output,
     trace_id_args_output,
     datasets_dropdown_options_output,
     datasets_dropdown_value_output,
@@ -75,7 +76,13 @@ def edit_button_click(
         elif isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'dropdown':
             for _output in output:
                 arg_name = _output['id']['arg_name']
-                sub_type_dropdowns_output[trace_dropdowns_arg_name.index(arg_name)] = trace_args.get(arg_name, no_update)
+                arg_options = getattr(chart_arg_builder, arg_name + "_default")()
+                arg_value = trace_args.get(arg_name, None)
+                if arg_value is None:
+                    sub_type_dropdowns_value_output[trace_dropdowns_arg_name.index(arg_name)] = arg_options[0]['value']
+                else:
+                    sub_type_dropdowns_value_output[trace_dropdowns_arg_name.index(arg_name)] = arg_value
+                sub_type_dropdowns_options_output[trace_dropdowns_arg_name.index(arg_name)] = arg_options
 
     datasets_dropdown_value_output = trace.dataset_id
     traces_type_dropdown_value_output = trace.args['type'].capitalize()
