@@ -10,7 +10,8 @@ class Bar(Args):
         'visible',
         'showlegend',
         'legendrank',
-        'legendgroup'
+        'legendgroup',
+        'legendgrouptitle',
     ]
     
     @staticmethod

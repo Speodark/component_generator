@@ -38,9 +38,6 @@ $trace-arg-font-size: 1.5rem;
     &__info-tab {
         padding: 2rem;
         overflow-y: auto;
-        & > * {
-            padding-bottom: 0.8rem;
-        }
     }
 
     // DMC input
@@ -57,7 +54,7 @@ $trace-arg-font-size: 1.5rem;
         & .Select {
             height: 100%;
             & .Select-control {
-                height: 100%;
+                height: 100%;     
             }
         }
     }
@@ -72,8 +69,8 @@ $trace-arg-font-size: 1.5rem;
 
     // Container
     &__container {
-        padding: 1.5rem;
-        padding-left: 2rem;
+        width: max-content;
+        padding: 1.5rem 1.5rem;
         border: 1.5px solid blue;
     }
 }

@@ -155,6 +155,7 @@ def arguments_popup():
         size='xl',
         centered=True,
         backdrop='static',
+        keyboard=False,
         children=[
             dcc.Store(id='trace_id_args'),
             dcc.Store(id='updated_trace_trigger'),
@@ -233,6 +234,7 @@ def arguments_popup():
                                     args_builder.showlegend(),
                                     args_builder.legendrank(),
                                     args_builder.legendgroup(),
+                                    args_builder.legendgrouptitle()
 
                                 ], 
                                 value='Style',

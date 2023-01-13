@@ -69,6 +69,9 @@ body {
 .invisible {
   opacity: 0; }
 
+.label-item-divider {
+  margin-bottom: 0.8rem; }
+
 .arrow {
   border: solid black;
   border-width: 0 3px 3px 0;
@@ -307,8 +310,6 @@ body {
   .trace-arg__info-tab {
     padding: 2rem;
     overflow-y: auto; }
-    .trace-arg__info-tab > * {
-      padding-bottom: 0.8rem; }
   .trace-arg .mantine-1js7218 {
     font-size: 1.5rem; }
   .trace-arg .mantine-1qcpoqw {
@@ -325,8 +326,8 @@ body {
       display: flex;
       align-items: center; }
   .trace-arg__container {
-    padding: 1.5rem;
-    padding-left: 2rem;
+    width: max-content;
+    padding: 1.5rem 1.5rem;
     border: 1.5px solid blue; }
 
 .delete-used-dataset {
