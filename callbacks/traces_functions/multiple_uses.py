@@ -7,21 +7,53 @@ from utilities.db import (
     get_dataset
 )
 
+
 def new_figure_args(trace_type, trace_dropdowns, trace_inputs):
-    def insert_to_dict(new_fig_args, state_type, state_values):
+
+
+    def add_to_dict(lst, value, dct):
+        for i in range(len(lst) - 1):
+            key = lst[i]
+            if key in dct:
+                dct = dct[key]
+            else:
+                dct[key] = {}
+                dct = dct[key]
+        dct[lst[-1]] = value
+
+
+    def insert_to_dict(chart_arg_builder, new_fig_args, state_type, state_values, sub_type):
         for index, state_ in enumerate(state_type):
-            if state_['id']['arg_name'] in charts_dict[trace_type].args_list:
-                new_fig_args[state_['id']['arg_name']] = state_values[index]
+            arg_placement = state_['id']['arg_name'].split('_')
+            arg_name = state_['id']['arg_name']
+            # Trying to get the default value for the arg, this is because we have no default for the data
+            default_value = getattr(chart_arg_builder, arg_name + "_default", None)
+            # If the default arg exists then call the function
+            if default_value is not None:
+                default_value = default_value()
+                # If the default arg is of type dropdown the default value will be in the [0]['value'] position
+                if sub_type == 'dropdown':
+                    default_value = default_value[0]['value']
+
+            if arg_placement[0] in charts_dict[trace_type].args_list:
+                if len(arg_placement) == 1:
+                    if default_value != state_values[index]:
+                        new_fig_args[arg_name] = state_values[index]
+                else:
+                    if default_value != state_values[index]:
+                        add_to_dict(arg_placement, state_values[index], new_fig_args)
         return new_fig_args
 
+
+    chart_arg_builder = charts_dict[trace_type]()
     new_fig_args = {}
     for state_type in ctx.states_list:
         if isinstance(state_type, list) and state_type:
             if state_type[0]['id'].get('sub_type') == 'dropdown':
-                new_fig_args = insert_to_dict(new_fig_args, state_type, trace_dropdowns)
+                new_fig_args = insert_to_dict(chart_arg_builder, new_fig_args, state_type, trace_dropdowns, 'dropdown')
 
             elif state_type[0]['id'].get('sub_type') == 'input':
-                new_fig_args = insert_to_dict(new_fig_args, state_type, trace_inputs)
+                new_fig_args = insert_to_dict(chart_arg_builder, new_fig_args, state_type, trace_inputs, 'input')
     return new_fig_args
 
 

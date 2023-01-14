@@ -305,6 +305,7 @@ def trace_arguments_popup(
         )
         new_fig_args = new_figure_args(trace_type, trace_dropdowns, trace_inputs)
         fig_json = getattr(go, trace_type)(**fig_data, **new_fig_args).to_plotly_json()
+        
         ##################################
         if (
             trace.args != fig_json or  # Did the args change

@@ -4,6 +4,14 @@ import pandas as pd
 
 class Args:
 
+    ########### NAME ########### 
+    def name_default(self):
+        # the name is an unusual case because its a must have and will never be None
+        # We need the function for when we check if the value is equal to the default
+        # The answer will always be no but in order to not get an error this exists
+        return None
+
+
     ########### VISIBLE ###########
     def visible_default(self):
         return [
