@@ -11,6 +11,16 @@ from utilities.db import (
 
 args_builder = Args()
 
+# this function will return the value for the dictionary arguments
+def get_value(dictionary, keys):
+    for key in keys:
+        if key in dictionary:
+            dictionary = dictionary[key]
+        else:
+            return None
+    return dictionary
+
+
 def edit_button_click(
     # Regular args
     trace_n_clicks,
@@ -64,12 +74,12 @@ def edit_button_click(
     chart_arg_builder = charts_dict[trace.args['type'].capitalize()]()
     # If there is a trace I want to update all the arguments to be by that trace
     trace_args = trace.args
-    # sub_type_inputs_output[trace_inputs_arg_name.index('name')] = trace.trace_name
     for output in ctx.outputs_list:
         if isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'input':
             for _output in output:
                 arg_name = _output['id']['arg_name']
-                arg_value = trace_args.get(arg_name, None)
+                arg_placement = _output['id']['arg_name'].split('_')
+                arg_value = get_value(trace_args, arg_placement)
                 if arg_value is None:
                     arg_value = getattr(chart_arg_builder, arg_name + "_default")()
                 sub_type_inputs_output[trace_inputs_arg_name.index(arg_name)] = arg_value
@@ -77,7 +87,8 @@ def edit_button_click(
             for _output in output:
                 arg_name = _output['id']['arg_name']
                 arg_options = getattr(chart_arg_builder, arg_name + "_default")()
-                arg_value = trace_args.get(arg_name, None)
+                arg_placement = _output['id']['arg_name'].split('_')
+                arg_value = get_value(trace_args, arg_placement)
                 if arg_value is None:
                     sub_type_dropdowns_value_output[trace_dropdowns_arg_name.index(arg_name)] = arg_options[0]['value']
                 else:

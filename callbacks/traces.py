@@ -267,7 +267,7 @@ def trace_arguments_popup(
     popup_is_open_output = no_update # Is the popup open?
     trace_id_args_output = no_update # The id of the trace that opened the popup
     sub_type_inputs_output = [no_update for x in range(num_sub_type_inputs)] # The name of the trace that opened the popup
-    sub_type_inputs_error_output = [no_update for x in range(num_sub_type_inputs)] # The text for the error of the name text
+    sub_type_inputs_error_output = [None for x in range(num_sub_type_inputs)] # The text for the error of the name text
     datasets_dropdown_options_output = no_update # the list of available dataset
     datasets_dropdown_value_output = no_update # The value of the current trace
     traces_type_dropdown_value_output = no_update # The graph type of the current trace
@@ -303,7 +303,7 @@ def trace_arguments_popup(
             store_trace_id,
             fig_data
         )
-        new_fig_args = new_figure_args(trace_type, trace_dropdowns, trace_inputs)
+        new_fig_args = new_figure_args(trace_type, trace_dropdowns, trace_inputs, trace_inputs_arg_name, sub_type_inputs_error_output)
         fig_json = getattr(go, trace_type)(**fig_data, **new_fig_args).to_plotly_json()
         
         ##################################
@@ -453,7 +453,7 @@ def trace_arguments_popup(
 
         # Build the figure and if it was changed add the update figure function
         ################################## GET ARGS AND BUILD FIG
-        new_fig_args = new_figure_args(trace_type, trace_dropdowns, trace_inputs)
+        new_fig_args = new_figure_args(trace_type, trace_dropdowns, trace_inputs, trace_inputs_arg_name, sub_type_inputs_error_output)
         fig_json.update(getattr(go, trace_type)(**fig_data, **new_fig_args).to_plotly_json())
         ##################################
         if trace.args != fig_json:

@@ -75,8 +75,9 @@ class Args:
                 value=self.legendrank_default(),
                 style={"width": 200},
                 precision=0,
+                min=0,
                 hideControls = True,
-                size='md',
+                size='md'
             )
         )
 

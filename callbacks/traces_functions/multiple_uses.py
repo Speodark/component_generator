@@ -1,14 +1,16 @@
 from dash import ctx
 from components.charts import charts_dict
+import plotly.graph_objects as go
 from dash.exceptions import PreventUpdate
 import pandas as pd
+import copy
 from utilities.db import (
     get_trace,
     get_dataset
 )
 
 
-def new_figure_args(trace_type, trace_dropdowns, trace_inputs):
+def new_figure_args(trace_type, trace_dropdowns, trace_inputs, trace_inputs_arg_name, sub_type_inputs_error_output):
 
 
     def add_to_dict(lst, value, dct):
@@ -21,6 +23,21 @@ def new_figure_args(trace_type, trace_dropdowns, trace_inputs):
                 dct = dct[key]
         dct[lst[-1]] = value
 
+    # Will only work on inputs (only suppose to work on inputs if its dropdowns then its my problem)
+    def is_valid_value(new_fig_args, arg, value):
+        temp_dict = copy.deepcopy(new_fig_args)
+        if len(arg) > 1:
+            add_to_dict(arg, value, temp_dict)
+        else:
+            temp_dict[arg[0]] = value
+        try:
+            getattr(go, trace_type)(**temp_dict)
+            return True
+        except Exception as e:
+            print('_'.join(arg))
+            sub_type_inputs_error_output[trace_inputs_arg_name.index('_'.join(arg))] = 'Invalid Prop'
+            print(e)
+            return False
 
     def insert_to_dict(chart_arg_builder, new_fig_args, state_type, state_values, sub_type):
         for index, state_ in enumerate(state_type):
@@ -38,10 +55,12 @@ def new_figure_args(trace_type, trace_dropdowns, trace_inputs):
             if arg_placement[0] in charts_dict[trace_type].args_list:
                 if len(arg_placement) == 1:
                     if default_value != state_values[index]:
-                        new_fig_args[arg_name] = state_values[index]
+                        if is_valid_value(new_fig_args, arg_placement, state_values[index]):
+                            new_fig_args[arg_name] = state_values[index]
                 else:
                     if default_value != state_values[index]:
-                        add_to_dict(arg_placement, state_values[index], new_fig_args)
+                        if is_valid_value(new_fig_args, arg_placement, state_values[index]):
+                            add_to_dict(arg_placement, state_values[index], new_fig_args)
         return new_fig_args
 
 
