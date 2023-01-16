@@ -10,7 +10,7 @@ from utilities.db import (
 )
 
 
-def new_figure_args(trace_type, trace_dropdowns, trace_inputs, trace_inputs_arg_name, sub_type_inputs_error_output):
+def new_figure_args(trace_type, trace_dropdowns, trace_multi_dropdowns, trace_inputs, trace_inputs_arg_name, sub_type_inputs_error_output):
 
 
     def add_to_dict(lst, value, dct):
@@ -53,14 +53,20 @@ def new_figure_args(trace_type, trace_dropdowns, trace_inputs, trace_inputs_arg_
                     default_value = default_value[0]['value']
 
             if arg_placement[0] in charts_dict[trace_type].args_list:
+                value = state_values[index]
+                # SPECIAL CASES CHANGES
+                # If the string family in the state arg_name we need to connect the values list to be comma seperated
+                if 'family' in arg_name:
+                    value = ','.join(value)
+
                 if len(arg_placement) == 1:
-                    if default_value != state_values[index]:
-                        if is_valid_value(new_fig_args, arg_placement, state_values[index]):
-                            new_fig_args[arg_name] = state_values[index]
+                    if default_value != value:
+                        if is_valid_value(new_fig_args, arg_placement, value):
+                            new_fig_args[arg_name] = value
                 else:
-                    if default_value != state_values[index]:
-                        if is_valid_value(new_fig_args, arg_placement, state_values[index]):
-                            add_to_dict(arg_placement, state_values[index], new_fig_args)
+                    if default_value != value:
+                        if is_valid_value(new_fig_args, arg_placement, value):
+                            add_to_dict(arg_placement, value, new_fig_args)
         return new_fig_args
 
 
@@ -70,7 +76,8 @@ def new_figure_args(trace_type, trace_dropdowns, trace_inputs, trace_inputs_arg_
         if isinstance(state_type, list) and state_type:
             if state_type[0]['id'].get('sub_type') == 'dropdown':
                 new_fig_args = insert_to_dict(chart_arg_builder, new_fig_args, state_type, trace_dropdowns, 'dropdown')
-
+            elif state_type[0]['id'].get('sub_type') == 'multi-dropdown':
+                new_fig_args = insert_to_dict(chart_arg_builder, new_fig_args, state_type, trace_multi_dropdowns, 'multi-dropdown')
             elif state_type[0]['id'].get('sub_type') == 'input':
                 new_fig_args = insert_to_dict(chart_arg_builder, new_fig_args, state_type, trace_inputs, 'input')
     return new_fig_args

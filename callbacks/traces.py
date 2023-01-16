@@ -207,6 +207,8 @@ def update_traces_container(
     Output({'type':'trace_arg', 'sub_type':'divider', 'arg_name':ALL}, 'className'),
     Output({'type':'trace_arg', 'sub_type':'dropdown', 'arg_name':ALL}, 'value'),
     Output({'type':'trace_arg', 'sub_type':'dropdown', 'arg_name':ALL}, 'options'),
+    Output({'type':'trace_arg', 'sub_type':'multi-dropdown', 'arg_name':ALL}, 'value'),
+    Output({'type':'trace_arg', 'sub_type':'multi-dropdown', 'arg_name':ALL}, 'options'),
     Output('dont_save_changes_popup', 'is_open'),
     Input({'type':'trace_card','id':ALL,'sub_type':'edit'}, 'n_clicks'),
     Input('close-arg-popup', 'n_clicks'),
@@ -221,6 +223,7 @@ def update_traces_container(
     State({'type':'trace_arg', 'sub_type':'dropdown', 'arg_name':ALL}, 'value'),
     State('components-dropdown','value'),
     State({'type':'trace_arg', 'sub_type':'divider', 'arg_name':ALL}, 'className'),
+    State({'type':'trace_arg', 'sub_type':'multi-dropdown', 'arg_name':ALL}, 'value'),
     prevent_initial_call = True
 )
 def trace_arguments_popup(
@@ -237,14 +240,17 @@ def trace_arguments_popup(
     trace_inputs,
     trace_dropdowns,
     component_id,
-    trace_args_classnames
+    trace_args_classnames,
+    trace_multi_dropdowns
 ):
     num_sub_type_inputs = 0
     num_sub_type_dropdowns = 0
+    num_sub_type_multi_dropdowns = 0
     numer_of_trace_cards = 0
     num_of_args = 0
     trace_inputs_arg_name = []
     trace_dropdowns_arg_name = []
+    trace_multi_dropdowns_arg_name = []
     trace_cards_ids_by_order = []
     
     for output in ctx.outputs_list:
@@ -256,6 +262,10 @@ def trace_arguments_popup(
             num_sub_type_dropdowns = len(output)
             for _output in output:
                 trace_dropdowns_arg_name.append(_output['id']['arg_name'])
+        elif isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'multi-dropdown':
+            num_sub_type_multi_dropdowns = len(output)
+            for _output in output:
+                trace_multi_dropdowns_arg_name.append(_output['id']['arg_name'])
         elif isinstance(output,list) and output and output[0]['id'].get('type') == 'trace_card' and output[0]['id'].get('sub_type') == 'name':
             numer_of_trace_cards = len(output)
             for _output in output:
@@ -270,13 +280,15 @@ def trace_arguments_popup(
     sub_type_inputs_error_output = [None for x in range(num_sub_type_inputs)] # The text for the error of the name text
     datasets_dropdown_options_output = no_update # the list of available dataset
     datasets_dropdown_value_output = no_update # The value of the current trace
-    traces_type_dropdown_value_output = no_update # The graph type of the current trace
+    trace_type_dropdown_value_output = no_update # The graph type of the current trace
     data_container_children_output = no_update # The data requirements for the chart type
     trace_card_name_output = [no_update for x in range(numer_of_trace_cards)] # The names of all the traces cards
     updated_trace_trigger_output = no_update
     trace_args_classnames_output = [no_update for x in range(num_of_args)]
     sub_type_dropdowns_value_output = [no_update for x in range(num_sub_type_dropdowns)] # The dropdowns values
     sub_type_dropdowns_options_output = [no_update for x in range(num_sub_type_dropdowns)] # The dropdowns options
+    sub_type_multi_dropdowns_value_output = [no_update for x in range(num_sub_type_multi_dropdowns)] # The dropdowns values
+    sub_type_multi_dropdowns_options_output = [no_update for x in range(num_sub_type_multi_dropdowns)] # The dropdowns options
     dont_save_changes_popup_output = no_update # is the dont save changes popup is open?
 
     triggered_id = ctx.triggered_id
@@ -303,7 +315,7 @@ def trace_arguments_popup(
             store_trace_id,
             fig_data
         )
-        new_fig_args = new_figure_args(trace_type, trace_dropdowns, trace_inputs, trace_inputs_arg_name, sub_type_inputs_error_output)
+        new_fig_args = new_figure_args(trace_type, trace_dropdowns, trace_multi_dropdowns, trace_inputs, trace_inputs_arg_name, sub_type_inputs_error_output)
         fig_json = getattr(go, trace_type)(**fig_data, **new_fig_args).to_plotly_json()
         
         ##################################
@@ -334,7 +346,7 @@ def trace_arguments_popup(
             datasets_dropdown_value_output,
             data_container_children_output,
             trace_args_classnames_output,
-            traces_type_dropdown_value_output
+            trace_type_dropdown_value_output
         ) = edit_button_click(
             # Regular args
             trace_n_clicks,
@@ -350,7 +362,10 @@ def trace_arguments_popup(
             datasets_dropdown_options_output,
             datasets_dropdown_value_output,
             data_container_children_output,
-            trace_args_classnames_output
+            trace_args_classnames_output,
+            sub_type_multi_dropdowns_value_output,
+            sub_type_multi_dropdowns_options_output,
+            trace_multi_dropdowns_arg_name
         )
 
 
@@ -453,7 +468,7 @@ def trace_arguments_popup(
 
         # Build the figure and if it was changed add the update figure function
         ################################## GET ARGS AND BUILD FIG
-        new_fig_args = new_figure_args(trace_type, trace_dropdowns, trace_inputs, trace_inputs_arg_name, sub_type_inputs_error_output)
+        new_fig_args = new_figure_args(trace_type, trace_dropdowns, trace_multi_dropdowns, trace_inputs, trace_inputs_arg_name, sub_type_inputs_error_output)
         fig_json.update(getattr(go, trace_type)(**fig_data, **new_fig_args).to_plotly_json())
         ##################################
         if trace.args != fig_json:
@@ -478,12 +493,14 @@ def trace_arguments_popup(
         sub_type_inputs_error_output,
         datasets_dropdown_options_output,
         datasets_dropdown_value_output,
-        traces_type_dropdown_value_output,
+        trace_type_dropdown_value_output,
         data_container_children_output,
         trace_card_name_output,
         updated_trace_trigger_output,
         trace_args_classnames_output,
         sub_type_dropdowns_value_output,
         sub_type_dropdowns_options_output,
+        sub_type_multi_dropdowns_value_output,
+        sub_type_multi_dropdowns_options_output,
         dont_save_changes_popup_output
     )

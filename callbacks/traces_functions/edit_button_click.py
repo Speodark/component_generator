@@ -36,7 +36,10 @@ def edit_button_click(
     datasets_dropdown_options_output,
     datasets_dropdown_value_output,
     data_container_children_output,
-    trace_args_classnames_output
+    trace_args_classnames_output,
+    sub_type_multi_dropdowns_value_output,
+    sub_type_multi_dropdowns_options_output,
+    trace_multi_dropdowns_arg_name
 ):
     triggered_id = ctx.triggered_id
     # Prevents update if the n_clicks started the function but wasn't clicked
@@ -72,7 +75,7 @@ def edit_button_click(
         raise PreventUpdate
 
     chart_arg_builder = charts_dict[trace.args['type'].capitalize()]()
-    # If there is a trace I want to update all the arguments to be by that trace
+    # If there is a trace, I want to update all the arguments to be by that trace
     trace_args = trace.args
     for output in ctx.outputs_list:
         if isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'input':
@@ -94,23 +97,35 @@ def edit_button_click(
                 else:
                     sub_type_dropdowns_value_output[trace_dropdowns_arg_name.index(arg_name)] = arg_value
                 sub_type_dropdowns_options_output[trace_dropdowns_arg_name.index(arg_name)] = arg_options
+        elif isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'multi-dropdown':
+            for _output in output:
+                arg_name = _output['id']['arg_name']
+                arg_options = getattr(chart_arg_builder, arg_name + "_options")()
+                arg_default = getattr(chart_arg_builder, arg_name + "_default")()
+                arg_placement = _output['id']['arg_name'].split('_')
+                arg_value = get_value(trace_args, arg_placement)
+                if arg_value is None:
+                    sub_type_multi_dropdowns_value_output[trace_multi_dropdowns_arg_name.index(arg_name)] = arg_default
+                else:
+                    sub_type_multi_dropdowns_value_output[trace_multi_dropdowns_arg_name.index(arg_name)] = arg_value
+                sub_type_multi_dropdowns_options_output[trace_multi_dropdowns_arg_name.index(arg_name)] = arg_options
 
     datasets_dropdown_value_output = trace.dataset_id
-    traces_type_dropdown_value_output = trace.args['type'].capitalize()
+    trace_type_dropdown_value_output = trace.args['type'].capitalize()
 
     # Handle data container childrens
-    if not trace.dataset_id and not traces_type_dropdown_value_output:
+    if not trace.dataset_id and not trace_type_dropdown_value_output:
         data_container_children_output = "Choose a dataset and a trace type!"
     elif not trace.dataset_id:
         data_container_children_output = "Choose a dataset!"
-    elif not traces_type_dropdown_value_output:
+    elif not trace_type_dropdown_value_output:
         data_container_children_output = "Choose a Type!"
     else:
         dataset = None
         with session_maker() as session:
             dataset = pd.DataFrame(get_dataset(trace.dataset_id, session).data)
         active_columns = trace.active_columns
-        data_container_children_output = charts_dict[traces_type_dropdown_value_output].data_arg(dataset, active_columns)
+        data_container_children_output = charts_dict[trace_type_dropdown_value_output].data_arg(dataset, active_columns)
 
     # Which arguments to show
     for state_type in ctx.states_list:
@@ -130,7 +145,7 @@ def edit_button_click(
         datasets_dropdown_value_output,
         data_container_children_output,
         trace_args_classnames_output,
-        traces_type_dropdown_value_output
+        trace_type_dropdown_value_output
     )
     
 

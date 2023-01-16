@@ -120,17 +120,39 @@ class Args:
 
     ########### LEGENDGROUPTITLE FONT FAMILY ###########
     def legendgrouptitle_font_family_default(self):
-        return 0
+        return None
+
+    def legendgrouptitle_font_family_options(self):
+        return [
+            {'label': 'Arial', 'value': 'Arial'},
+            {'label': 'Balto', 'value': 'Balto'},
+            {'label': 'Courier New', 'value': 'Courier New'},
+            {'label': 'Droid Sans', 'value': 'Droid Sans'},
+            {'label': 'Droid Serif', 'value': 'Droid Serif'},
+            {'label': 'Droid Sans Mono', 'value': 'Droid Sans Mono'},
+            {'label': 'Gravitas One', 'value': 'Gravitas One'},
+            {'label': 'Old Standard TT', 'value': 'Old Standard TT'},
+            {'label': 'Open Sans', 'value': 'Open Sans'},
+            {'label': 'Overpass', 'value': 'Overpass'},
+            {'label': 'PT Sans Narrow', 'value': 'PT Sans Narrow'},
+            {'label': 'Raleway', 'value': 'Raleway'},
+            {'label': 'Times New Roman', 'value': 'Times New Roman'},
+        ]
 
     def legendgrouptitle_font_family(self):
         return html.Div(
             className='label-item-divider',
-            children=dmc.TextInput(
-                id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'legendgrouptitle_font_family'},
-                label='Family:',
-                style={'width':200},
-                size='md',
-            )
+            children=[
+                html.Label('Size:'),
+                dcc.Dropdown(
+                    options=self.legendgrouptitle_font_family_options(),
+                    value=self.showlegend_default()[0]['value'],
+                    clearable=True,
+                    className='trace-arg__dropdown',
+                    id={'type':'trace_arg', 'sub_type':'multi-dropdown', 'arg_name':'legendgrouptitle_font_family'},
+                    multi=True
+                )
+            ]
         )
 
 
@@ -143,7 +165,7 @@ class Args:
             className='label-item-divider',
             children=dmc.TextInput(
                 id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'legendgrouptitle_font_color'},
-                label='Font:',
+                label='Color:',
                 style={'width':200},
                 size='md',
             )
@@ -177,20 +199,20 @@ class Args:
                     className='trace-arg__container',
                     children=[
                         self.legendgrouptitle_text(),
-                        # html.Div(
-                        #     className='label-item-divider',
-                        #     children=[
-                        #         html.Label('Font:'),
-                        #         html.Div(
-                        #             className='trace-arg__container',
-                        #             children=[
-                        #                 self.legendgrouptitle_font_color(),
-                        #                 self.legendgrouptitle_font_family(),
-                        #                 self.legendgrouptitle_font_size()
-                        #             ]
-                        #         )
-                        #     ]
-                        # )
+                        html.Div(
+                            className='label-item-divider',
+                            children=[
+                                html.Label('Font:'),
+                                html.Div(
+                                    className='trace-arg__container',
+                                    children=[
+                                        self.legendgrouptitle_font_color(),
+                                        self.legendgrouptitle_font_family(),
+                                        self.legendgrouptitle_font_size()
+                                    ]
+                                )
+                            ]
+                        )
                     ]
                 )
             ]
