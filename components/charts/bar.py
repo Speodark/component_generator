@@ -12,6 +12,18 @@ class Bar(Args):
         'legendrank',
         'legendgroup',
         'legendgrouptitle',
+        'legendwidth',
+        'opacity',
+        'ids',
+        'x0',
+        'dx',
+        'y0',
+        'dy',
+        'base',
+        'width',
+        'offset',
+        'text',
+        'textposition',
     ]
     
     @staticmethod

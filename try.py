@@ -1,23 +1,16 @@
 import plotly.graph_objects as go
 
-# Create a bar chart with two bars, grouped together in one legend item
-trace1 = go.Bar(x=[1, 2], y=[10, 20], legendgroup='Group 1', name='Bar 1')
-trace2 = go.Bar(x=[1, 2], y=[15, 25], legendgroup='Group 1', name='Bar 2',
-legendgrouptitle={
-    'font' : {
-        'color' : 'red',
-        'family' : 'Overpass, Balto',
-        'size' : 20
-    },
-    'text' : 'hello'
-}
+# Create some data
+x = ["A", "B", "C", "D"]
+y1 = [1, 2, 3, 4]
+y2 = [-2, -1, 0, 1]
 
+# Create the bar chart
+fig = go.Figure(data=[go.Bar(x=x, y=y1, name="y1", base=0),
+                     go.Bar(x=x, y=y2, name="y2", base=-5)])
+fig.update_layout(
+    xaxis=dict(title='X axis'),
+    yaxis=dict(title='Y axis'),
+    barmode='group'
 )
-
-data = [trace1, trace2]
-layout = go.Layout(
-    xaxis=dict(tickvals=[1, 2]),
-    yaxis=dict(title='Value'),
-)
-fig = go.Figure(data=data, layout=layout)
 fig.show()

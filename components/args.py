@@ -219,7 +219,63 @@ class Args:
         )
 
 
-        
+    ########### LEGENDWIDTH ###########
+    def legendwidth_default(self):
+        return None
+
+    def legendwidth(self):
+        return html.Div(
+            className='label-item-divider',
+            id={'type':'trace_arg', 'sub_type':'divider', 'arg_name':'legendwidth'},
+            children=dmc.NumberInput(
+                id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'legendwidth'},
+                label="Legend Width:",
+                value=self.legendwidth_default(),
+                style={"width": 200},
+                precision=0,
+                min=0,
+                hideControls = True,
+                size='md'
+            )
+        )
+
+
+    ########### OPACITY ###########
+    def opacity_default(self):
+        return 1
+
+    def opacity(self):
+        return html.Div(
+            className='label-item-divider',
+            id={'type':'trace_arg', 'sub_type':'divider', 'arg_name':'opacity'},
+            children=dmc.NumberInput(
+                id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'opacity'},
+                label="Opacity:",
+                value=self.opacity_default(),
+                style={"width": 200},
+                precision=3,
+                min=0,
+                max=1,
+                hideControls = True,
+                size='md'
+            )
+        )
+
+
+    ########### IDS ###########
+    def ids_default(self):
+        return ''
+
+    def ids(self):
+        return html.Div(
+            className='label-item-divider',
+            children=dmc.TextInput(
+                id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'ids'},
+                label='Text:',
+                style={'width':200},
+                size='md',
+            )
+        )
         
         
         

@@ -470,6 +470,7 @@ def trace_arguments_popup(
         ################################## GET ARGS AND BUILD FIG
         new_fig_args = new_figure_args(trace_type, trace_dropdowns, trace_multi_dropdowns, trace_inputs, trace_inputs_arg_name, sub_type_inputs_error_output)
         fig_json.update(getattr(go, trace_type)(**fig_data, **new_fig_args).to_plotly_json())
+        print(new_fig_args)
         ##################################
         if trace.args != fig_json:
             update_db_functions_list.append((update_trace, (store_trace_id, fig_json)))

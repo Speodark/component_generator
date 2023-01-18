@@ -34,9 +34,9 @@ def new_figure_args(trace_type, trace_dropdowns, trace_multi_dropdowns, trace_in
             getattr(go, trace_type)(**temp_dict)
             return True
         except Exception as e:
-            print('_'.join(arg))
-            sub_type_inputs_error_output[trace_inputs_arg_name.index('_'.join(arg))] = 'Invalid Prop'
             print(e)
+            sub_type_inputs_error_output[trace_inputs_arg_name.index('_'.join(arg))] = 'Invalid Prop'
+            print('_'.join(arg))
             return False
 
     def insert_to_dict(chart_arg_builder, new_fig_args, state_type, state_values, sub_type):
@@ -56,8 +56,12 @@ def new_figure_args(trace_type, trace_dropdowns, trace_multi_dropdowns, trace_in
                 value = state_values[index]
                 # SPECIAL CASES CHANGES
                 # If the string family in the state arg_name we need to connect the values list to be comma seperated
-                if 'family' in arg_name:
-                    value = ','.join(value)
+                
+                if 'family' in arg_name and isinstance(value,list):
+                    if value:
+                        value = ','.join(value)
+                    else:
+                        value = None
 
                 if len(arg_placement) == 1:
                     if default_value != value:

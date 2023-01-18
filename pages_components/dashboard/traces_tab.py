@@ -234,7 +234,9 @@ def arguments_popup():
                                     args_builder.showlegend(),
                                     args_builder.legendrank(),
                                     args_builder.legendgroup(),
-                                    args_builder.legendgrouptitle()
+                                    args_builder.legendgrouptitle(),
+                                    args_builder.legendwidth(),
+                                    args_builder.opacity(),
 
                                 ], 
                                 value='Style',
