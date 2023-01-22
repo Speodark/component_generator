@@ -263,20 +263,37 @@ class Args:
 
 
     ########### IDS ###########
-    def ids_default(self):
-        return ''
+    # def ids_default(self):
+    #     return ''
 
-    def ids(self):
+    # def ids(self):
+    #     return html.Div(
+    #         className='label-item-divider',
+    #         children=dmc.TextInput(
+    #             id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'ids'},
+    #             label='Text:',
+    #             style={'width':200},
+    #             size='md',
+    #         )
+    #     )
+        
+        
+    ########### BASE ###########
+    def base_default(self):
+        return 1
+
+    def base(self):
         return html.Div(
             className='label-item-divider',
-            children=dmc.TextInput(
-                id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'ids'},
-                label='Text:',
-                style={'width':200},
-                size='md',
+            id={'type':'trace_arg', 'sub_type':'divider', 'arg_name':'base'},
+            children=dmc.NumberInput(
+                id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'base'},
+                label="Base:",
+                value=self.base_default(),
+                style={"width": 200},
+                hideControls = True,
+                size='md'
             )
         )
-        
-        
         
         
