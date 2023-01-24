@@ -70,7 +70,7 @@ class Args:
             className='label-item-divider',
             id={'type':'trace_arg', 'sub_type':'divider', 'arg_name':'legendrank'},
             children=dmc.NumberInput(
-                id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'legendrank'},
+                id = {'type':'trace_arg', 'sub_type':'input', 'input_type':'default', 'arg_name':'legendrank'},
                 label="Legend Rank:",
                 value=self.legendrank_default(),
                 style={"width": 200},
@@ -91,7 +91,7 @@ class Args:
             className='label-item-divider',
             id={'type':'trace_arg', 'sub_type':'divider', 'arg_name':'legendgroup'},
             children=dmc.TextInput(
-                id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'legendgroup'},
+                id = {'type':'trace_arg', 'sub_type':'input', 'input_type':'default', 'arg_name':'legendgroup'},
                 label='Legend Group:',
                 style={'width':200},
                 size='md',
@@ -107,7 +107,7 @@ class Args:
         return html.Div(
             className='label-item-divider',
             children=dmc.NumberInput(
-                id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'legendgrouptitle_font_size'},
+                id = {'type':'trace_arg', 'sub_type':'input', 'input_type':'default', 'arg_name':'legendgrouptitle_font_size'},
                 label="Size:",
                 value=self.legendgrouptitle_font_size_default(),
                 style={"width": 200},
@@ -164,7 +164,7 @@ class Args:
         return html.Div(
             className='label-item-divider',
             children=dmc.TextInput(
-                id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'legendgrouptitle_font_color'},
+                id = {'type':'trace_arg', 'sub_type':'input', 'input_type':'default', 'arg_name':'legendgrouptitle_font_color'},
                 label='Color:',
                 style={'width':200},
                 size='md',
@@ -180,7 +180,7 @@ class Args:
         return html.Div(
             className='label-item-divider',
             children=dmc.TextInput(
-                id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'legendgrouptitle_text'},
+                id = {'type':'trace_arg', 'sub_type':'input', 'input_type':'default', 'arg_name':'legendgrouptitle_text'},
                 label='Text:',
                 style={'width':200},
                 size='md',
@@ -228,7 +228,7 @@ class Args:
             className='label-item-divider',
             id={'type':'trace_arg', 'sub_type':'divider', 'arg_name':'legendwidth'},
             children=dmc.NumberInput(
-                id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'legendwidth'},
+                id = {'type':'trace_arg', 'sub_type':'input', 'input_type':'default', 'arg_name':'legendwidth'},
                 label="Legend Width:",
                 value=self.legendwidth_default(),
                 style={"width": 200},
@@ -249,7 +249,7 @@ class Args:
             className='label-item-divider',
             id={'type':'trace_arg', 'sub_type':'divider', 'arg_name':'opacity'},
             children=dmc.NumberInput(
-                id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'opacity'},
+                id = {'type':'trace_arg', 'sub_type':'input', 'input_type':'default', 'arg_name':'opacity'},
                 label="Opacity:",
                 value=self.opacity_default(),
                 style={"width": 200},
@@ -270,7 +270,7 @@ class Args:
     #     return html.Div(
     #         className='label-item-divider',
     #         children=dmc.TextInput(
-    #             id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'ids'},
+    #             id = {'type':'trace_arg', 'sub_type':'input', 'input_type':'multi-string', 'arg_name':'ids'},
     #             label='Text:',
     #             style={'width':200},
     #             size='md',
@@ -287,7 +287,7 @@ class Args:
             className='label-item-divider',
             id={'type':'trace_arg', 'sub_type':'divider', 'arg_name':'base'},
             children=dmc.NumberInput(
-                id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'base'},
+                id = {'type':'trace_arg', 'sub_type':'input', 'input_type':'default', 'arg_name':'base'},
                 label="Base:",
                 value=self.base_default(),
                 style={"width": 200},
@@ -297,3 +297,19 @@ class Args:
         )
         
         
+    ########### SHOWLEGEND ###########
+    def width_default(self):
+        return None
+
+    def width(self):
+        return html.Div(
+            className='label-item-divider',
+            id={'type':'trace_arg', 'sub_type':'divider', 'arg_name':'width'},
+            children=dmc.TextInput(
+                id = {'type':'trace_arg', 'sub_type':'input', 'input_type':'multi_number', 'arg_name':'width'},
+                value=None,
+                label='Width:',
+                style={'width':200},
+                size='md',
+            )
+        )

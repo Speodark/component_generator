@@ -177,7 +177,7 @@ def arguments_popup():
                                 children=[
                                     # Name arg
                                     dmc.TextInput(
-                                        id = {'type':'trace_arg', 'sub_type':'input', 'arg_name':'name'},
+                                        id = {'type':'trace_arg', 'sub_type':'input', 'input_type':'default', 'arg_name':'name'},
                                         label='Name:',
                                         style={'width':200},
                                         required=True,
@@ -238,7 +238,7 @@ def arguments_popup():
                                     args_builder.legendwidth(),
                                     args_builder.opacity(),
                                     args_builder.base(),
-
+                                    args_builder.width(),
                                 ], 
                                 value='Style',
                                 className='trace-arg__info-tab'

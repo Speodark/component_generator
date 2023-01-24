@@ -54,6 +54,14 @@ def new_figure_args(trace_type, trace_dropdowns, trace_multi_dropdowns, trace_in
 
             if arg_placement[0] in charts_dict[trace_type].args_list:
                 value = state_values[index]
+                if sub_type == 'input':
+                    if state_['id']['input_type'] == 'multi_number':
+                        try:
+                            print(value, value.split(','))
+                            value = [float(num) for num in value.split(',')]
+                        except Exception as e:
+                            sub_type_inputs_error_output[trace_inputs_arg_name.index('_'.join(arg_placement))] = 'Invalid Prop'
+                            continue
                 # SPECIAL CASES CHANGES
                 # If the string family in the state arg_name we need to connect the values list to be comma seperated
                 
@@ -84,6 +92,7 @@ def new_figure_args(trace_type, trace_dropdowns, trace_multi_dropdowns, trace_in
                 new_fig_args = insert_to_dict(chart_arg_builder, new_fig_args, state_type, trace_multi_dropdowns, 'multi-dropdown')
             elif state_type[0]['id'].get('sub_type') == 'input':
                 new_fig_args = insert_to_dict(chart_arg_builder, new_fig_args, state_type, trace_inputs, 'input')
+    print(new_fig_args)  
     return new_fig_args
 
 

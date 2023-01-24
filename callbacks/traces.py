@@ -196,8 +196,8 @@ def update_traces_container(
 @dash.callback(
     Output('args-trace-popup', 'is_open'),
     Output('trace_id_args', 'data'),
-    Output({'type':'trace_arg', 'sub_type':'input', 'arg_name':ALL}, 'value'),
-    Output({'type':'trace_arg', 'sub_type':'input', 'arg_name':ALL}, 'error'),
+    Output({'type':'trace_arg', 'sub_type':'input', 'input_type':ALL, 'arg_name':ALL}, 'value'),
+    Output({'type':'trace_arg', 'sub_type':'input', 'input_type':ALL, 'arg_name':ALL}, 'error'),
     Output('trace-arg-dataset-dropdown', 'options'),
     Output('trace-arg-dataset-dropdown', 'value'),
     Output('trace-arg-type-dropdown', 'value'),
@@ -219,7 +219,7 @@ def update_traces_container(
     Input('dont_save_changes_cancel','n_clicks'),
     State('trace_id_args','data'),
     State({'type':'trace_arg', 'sub_type':'dropdown', 'section': 'data', 'arg_name':ALL} ,'value'),
-    State({'type':'trace_arg', 'sub_type':'input', 'arg_name':ALL}, 'value'),
+    State({'type':'trace_arg', 'sub_type':'input', 'input_type':ALL, 'arg_name':ALL}, 'value'),
     State({'type':'trace_arg', 'sub_type':'dropdown', 'arg_name':ALL}, 'value'),
     State('components-dropdown','value'),
     State({'type':'trace_arg', 'sub_type':'divider', 'arg_name':ALL}, 'className'),
@@ -470,7 +470,6 @@ def trace_arguments_popup(
         ################################## GET ARGS AND BUILD FIG
         new_fig_args = new_figure_args(trace_type, trace_dropdowns, trace_multi_dropdowns, trace_inputs, trace_inputs_arg_name, sub_type_inputs_error_output)
         fig_json.update(getattr(go, trace_type)(**fig_data, **new_fig_args).to_plotly_json())
-        print(new_fig_args)
         ##################################
         if trace.args != fig_json:
             update_db_functions_list.append((update_trace, (store_trace_id, fig_json)))
