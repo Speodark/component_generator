@@ -44,12 +44,22 @@ def dashboard_args():
 
 def generate_figure():
     traces = []
+    # Get all traces
     with session_maker() as session:
         component = get_newest_component(session)
         if component is not None:
             traces = [trace.args for trace in get_all_traces(component.id, session)]
+    # Checks that all traces are valid in case of a server side database error
+    working_traces = []
+    for trace in traces:
+        try:
+            go.Figure(data=[trace])
+            working_traces.append(trace)
+        except Exception as e:
+            print(trace['name'], "Has Invalid properties for some reason!")
+    # generate the figure
     return go.Figure(
-        data=traces
+        data=working_traces
     )
 
 def layout():

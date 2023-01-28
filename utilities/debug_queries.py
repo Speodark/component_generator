@@ -1,13 +1,13 @@
 from sqlalchemy import JSON
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import desc
-from models import Traces, Components, Datasets
+from db import Traces, Components, Datasets
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from deletes import delete_trace
+from db import delete_trace
 
 
-session_maker = sessionmaker(bind=create_engine('sqlite:///utilities/db/models.db'))
+session_maker = sessionmaker(bind=create_engine('sqlite:///db/models.db'))
 
 # def delete_all_trace_of_component(component_id:int, session: Session) -> bool:
 #     session.query(Traces).filter_by(component_id = component_id).delete()

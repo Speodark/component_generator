@@ -85,6 +85,9 @@ def edit_button_click(
                 arg_value = get_value(trace_args, arg_placement)
                 if arg_value is None:
                     arg_value = getattr(chart_arg_builder, arg_name + "_default")()
+                elif _output['id']['input_type'] in ('multi_number','multi_string'):
+                    if isinstance(arg_value, list):
+                        arg_value = ', '.join(str(n) for n in arg_value)
                 sub_type_inputs_output[trace_inputs_arg_name.index(arg_name)] = arg_value
         elif isinstance(output, list) and output and output[0]['id'].get('sub_type') == 'dropdown':
             for _output in output:

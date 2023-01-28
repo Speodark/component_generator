@@ -26,6 +26,13 @@ def update_figure(
     traces = []
     with session_maker() as session:
         traces = [trace.args for trace in get_all_traces(component_id, session)]
+    working_traces = []
+    for trace in traces:
+        try:
+            go.Figure(data=[trace])
+            working_traces.append(trace)
+        except:
+            print(trace['name'], "Has Invalid properties for some reason!")
     return go.Figure(
-        data=traces
+        data=working_traces
     )

@@ -1,11 +1,11 @@
 import plotly.graph_objects as go
 
-# Create data for the chart
-x = ['A', 'B', 'C', 'D']
-y = [1, 2, 3, 4]
+# Data for the chart
+x = ['Apples', 'Bananas', 'Oranges']
+y = [3, 2, 4]
 
-# Create the bar chart
-fig = go.Figure(data=[go.Bar(x=x, y=y, width=['0.4','1'])])
+# Create the chart
+fig = go.Figure(data=[go.Bar(x=x, y=y, hoverinfo='y+x+z+all')])
 
 # Show the chart
 fig.show()

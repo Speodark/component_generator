@@ -34,7 +34,7 @@ def new_figure_args(trace_type, trace_dropdowns, trace_multi_dropdowns, trace_in
             getattr(go, trace_type)(**temp_dict)
             return True
         except Exception as e:
-            print(e)
+            # print(e)
             sub_type_inputs_error_output[trace_inputs_arg_name.index('_'.join(arg))] = 'Invalid Prop'
             print('_'.join(arg))
             return False
@@ -52,33 +52,44 @@ def new_figure_args(trace_type, trace_dropdowns, trace_multi_dropdowns, trace_in
                 if sub_type == 'dropdown':
                     default_value = default_value[0]['value']
 
-            if arg_placement[0] in charts_dict[trace_type].args_list:
-                value = state_values[index]
+            value = state_values[index]
+            
+            if arg_placement[0] in charts_dict[trace_type].args_list and default_value != value:
+                if arg_name == 'text' or arg_name == 'Ids':
+                    print(default_value, type(value), arg_name)
                 if sub_type == 'input':
-                    if state_['id']['input_type'] == 'multi_number':
-                        try:
-                            print(value, value.split(','))
-                            value = [float(num) for num in value.split(',')]
-                        except Exception as e:
-                            sub_type_inputs_error_output[trace_inputs_arg_name.index('_'.join(arg_placement))] = 'Invalid Prop'
-                            continue
+                        if state_['id']['input_type'] == 'multi_number':
+                            try:
+                                # Is it more than one value
+                                if ',' in value:
+                                    value = [float(num) for num in value.split(',')]
+                            except Exception as e:
+                                sub_type_inputs_error_output[trace_inputs_arg_name.index('_'.join(arg_placement))] = 'Invalid Prop'
+                                continue
+                        elif state_['id']['input_type'] == 'multi_string':
+                            try:
+                                # Is it more than one value
+                                if ',' in value:
+                                    value = [elm.strip() for elm in value.split(',')]
+                            except Exception as e:
+                                sub_type_inputs_error_output[trace_inputs_arg_name.index('_'.join(arg_placement))] = 'Invalid Prop'
+                                continue
+
+
                 # SPECIAL CASES CHANGES
                 # If the string family in the state arg_name we need to connect the values list to be comma seperated
-                
                 if 'family' in arg_name and isinstance(value,list):
                     if value:
                         value = ','.join(value)
                     else:
                         value = None
 
-                if len(arg_placement) == 1:
-                    if default_value != value:
-                        if is_valid_value(new_fig_args, arg_placement, value):
-                            new_fig_args[arg_name] = value
-                else:
-                    if default_value != value:
-                        if is_valid_value(new_fig_args, arg_placement, value):
-                            add_to_dict(arg_placement, value, new_fig_args)
+
+                if is_valid_value(new_fig_args, arg_placement, value):
+                    if len(arg_placement) == 1:
+                        new_fig_args[arg_name] = value
+                    else:
+                        add_to_dict(arg_placement, value, new_fig_args)
         return new_fig_args
 
 
@@ -92,7 +103,7 @@ def new_figure_args(trace_type, trace_dropdowns, trace_multi_dropdowns, trace_in
                 new_fig_args = insert_to_dict(chart_arg_builder, new_fig_args, state_type, trace_multi_dropdowns, 'multi-dropdown')
             elif state_type[0]['id'].get('sub_type') == 'input':
                 new_fig_args = insert_to_dict(chart_arg_builder, new_fig_args, state_type, trace_inputs, 'input')
-    print(new_fig_args)  
+    print(new_fig_args)
     return new_fig_args
 
 
